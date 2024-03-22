@@ -9,18 +9,25 @@ import List from '@mui/material/List';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
-import Badge from '@mui/material/Badge';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
-import Paper from '@mui/material/Paper';
-import Link from '@mui/material/Link';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
 import MenuIcon from '@mui/icons-material/Menu';
+import LogoutIcon from '@mui/icons-material/Logout';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import NotificationsIcon from '@mui/icons-material/Notifications';
-import { mainListItems, secondaryListItems } from './listItems';
-// import Chart from './Chart';
-// import Deposits from './Deposits';
-// import Orders from './Orders';
+import QuestionAnswerIcon from '@mui/icons-material/QuestionAnswer';
+import GroupsIcon from '@mui/icons-material/Groups';
+import RecommendIcon from '@mui/icons-material/Recommend';
+import BarChartIcon from '@mui/icons-material/BarChart';
+import LockPersonIcon from '@mui/icons-material/LockPerson';
+import { useNavigate } from 'react-router-dom';
+import CustomerManagement from './CustomerManagement';
+import CustomerService from './CustomerService';
+import ProductRecommendation from './ProductRecommendation';
+import DataVisualization from './DataVisualization';
+import AuthorityManagement from './AuthorityManagement';
 
 const drawerWidth = 240;
 
@@ -72,10 +79,63 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 const defaultTheme = createTheme();
 
 export default function Home() {
-  const [open, setOpen] = React.useState(true);
+  const [open, setOpen] = React.useState(false);
+  const [selectedPage, setSelectedPage] = React.useState(1);
+  const navigate = useNavigate();
+
   const toggleDrawer = () => {
     setOpen(!open);
   };
+
+  const handleLogOut = () => {
+    navigate('../login');
+  };
+
+  const handleListItemButtonClick = (buttonId) => {
+    console.log('Item clicked:', buttonId);
+    setSelectedPage(buttonId);
+    setOpen(false);
+  };
+
+  const mainListItems = (
+    <React.Fragment>
+      <ListItemButton onClick={() => handleListItemButtonClick(1)} sx={selectedPage === 1 ? { backgroundColor: '#e0e0e0' } : {}}>
+        <ListItemIcon>
+          <GroupsIcon />
+        </ListItemIcon>
+        <ListItemText primary="客户管理" />
+      </ListItemButton>
+      <ListItemButton onClick={() => handleListItemButtonClick(2)} sx={selectedPage === 2 ? { backgroundColor: '#e0e0e0' } : {}}>
+        <ListItemIcon>
+          <QuestionAnswerIcon />
+        </ListItemIcon>
+        <ListItemText primary="客户服务" />
+      </ListItemButton>
+      <ListItemButton onClick={() => handleListItemButtonClick(3)} sx={selectedPage === 3 ? { backgroundColor: '#e0e0e0' } : {}}>
+        <ListItemIcon>
+          <RecommendIcon />
+        </ListItemIcon>
+        <ListItemText primary="产品功能推荐" />
+      </ListItemButton>
+      <ListItemButton onClick={() => handleListItemButtonClick(4)} sx={selectedPage === 4 ? { backgroundColor: '#e0e0e0' } : {}}>
+        <ListItemIcon>
+          <BarChartIcon />
+        </ListItemIcon>
+        <ListItemText primary="数据可视化" />
+      </ListItemButton>
+    </React.Fragment>
+  );
+  
+  const secondaryListItems = (
+    <React.Fragment>
+      <ListItemButton onClick={() => handleListItemButtonClick(5)} sx={selectedPage === 5 ? { backgroundColor: '#e0e0e0' } : {}}>
+        <ListItemIcon>
+          <LockPersonIcon />
+        </ListItemIcon>
+        <ListItemText primary="权限管理" />
+      </ListItemButton>
+    </React.Fragment>
+  );
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -106,12 +166,17 @@ export default function Home() {
               noWrap
               sx={{ flexGrow: 1 }}
             >
-              Dashboard
+              辅助营销推荐系统平台
             </Typography>
-            <IconButton color="inherit">
-              <Badge badgeContent={4} color="secondary">
-                <NotificationsIcon />
-              </Badge>
+            <IconButton
+                size="large"
+                aria-label="account of current user"
+                aria-controls="menu-appbar"
+                aria-haspopup="true"
+                onClick={handleLogOut}
+                color="inherit"
+              >
+              <LogoutIcon />
             </IconButton>
           </Toolbar>
         </AppBar>
@@ -150,38 +215,11 @@ export default function Home() {
           <Toolbar />
           <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
             <Grid container spacing={3}>
-              {/* Chart */}
-              {/* <Grid item xs={12} md={8} lg={9}>
-                <Paper
-                  sx={{
-                    p: 2,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    height: 240,
-                  }}
-                >
-                  <Chart />
-                </Paper>
-              </Grid> */}
-              {/* Recent Deposits */}
-              {/* <Grid item xs={12} md={4} lg={3}>
-                <Paper
-                  sx={{
-                    p: 2,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    height: 240,
-                  }}
-                >
-                  <Deposits />
-                </Paper>
-              </Grid> */}
-              {/* Recent Orders */}
-              {/* <Grid item xs={12}>
-                <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-                  <Orders />
-                </Paper>
-              </Grid> */}
+            {selectedPage === 1 && (<CustomerManagement/>)}
+            {selectedPage === 2 && (<CustomerService/>)}
+            {selectedPage === 3 && (<ProductRecommendation/>)}
+            {selectedPage === 4 && (<DataVisualization/>)}
+            {selectedPage === 5 && (<AuthorityManagement/>)}
             </Grid>
           </Container>
         </Box>
