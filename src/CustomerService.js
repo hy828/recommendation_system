@@ -90,7 +90,7 @@ const rows = [
   ),
 ];
 
-function AddRecordDialog({ open, handleClose }) {
+function RecordDialog({ open, handleClose }) {
   return (
     <Dialog
       open={open}
@@ -199,7 +199,7 @@ function AddRecordDialog({ open, handleClose }) {
   );
 }
 
-function AddReminderDialog({ open, handleClose }) {
+function ReminderDialog({ open, handleClose }) {
   return (
     <Dialog
       open={open}
@@ -312,7 +312,7 @@ export default function CustomerManagement() {
   const [openRecordDialog, setOpenRecordDialog] = React.useState(false);
   const [openReminderDialog, setOpenReminderDialog] = React.useState(false);
 
-  const handleClickOpenRecordDialog = () => {
+  const handleOpenRecordDialog = () => {
     setOpenRecordDialog(true);
   };
 
@@ -320,7 +320,7 @@ export default function CustomerManagement() {
     setOpenRecordDialog(false);
   };
 
-  const handleClickOpenReminderDialog = () => {
+  const handleOpenReminderDialog = () => {
     setOpenReminderDialog(true);
   };
 
@@ -335,7 +335,7 @@ export default function CustomerManagement() {
         <Typography component="h2" variant="h5" sx={{ mb: 4 }}>
           客户服务
         </Typography>
-        <Stack spacing={2} direction="row" sx={{ flexGrow: 1, mb: 5 }}>
+        <Stack direction="row" sx={{ flexGrow: 1, mb: 5 }}>
           <Search sx={{ flexGrow: 1 }}>
             <SearchIconWrapper>
               <SearchIcon />
@@ -346,10 +346,10 @@ export default function CustomerManagement() {
             />
           </Search>
           <Box>
-            <Button variant="contained" sx={{ mr: 3 }} onClick={handleClickOpenRecordDialog}>添加记录</Button>
-            <Button variant="contained" onClick={handleClickOpenReminderDialog}>添加待办事项</Button>
-            <AddRecordDialog open={openRecordDialog} handleClose={handleCloseRecordDialog} />
-            <AddReminderDialog open={openReminderDialog} handleClose={handleCloseReminderDialog} />
+            <Button variant="contained" sx={{ mr: 3 }} onClick={handleOpenRecordDialog}>添加记录</Button>
+            <Button variant="contained" onClick={handleOpenReminderDialog}>添加待办事项</Button>
+            <RecordDialog open={openRecordDialog} handleClose={handleCloseRecordDialog} />
+            <ReminderDialog open={openReminderDialog} handleClose={handleCloseReminderDialog} />
           </Box>
         </Stack>
         <Table size="small">

@@ -7,31 +7,34 @@ import { useNavigate } from 'react-router-dom';
 const defaultTheme = createTheme();
 
 export default function Login() {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
-    const handleSubmit = async (event) => {
-        event.preventDefault();
-        const username = new FormData(event.currentTarget).get('username');
-        const password = new FormData(event.currentTarget).get('password');
-        console.log({ username, password});
-        const response = await fetch('http://127.0.0.1:5000/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ username, password }),
-        });
-        console.log({response})
+  // 处理登录请求给后端，提交用户名和密码
+  const handleSubmit = async (event) => {
+      event.preventDefault();
+      const username = new FormData(event.currentTarget).get('username');
+      const password = new FormData(event.currentTarget).get('password');
+      // console.log({ username, password});
+      const response = await fetch('http://127.0.0.1:5000/login', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ username, password }),
+      });
+      // console.log({response})
+      const responseData = await response.json(); // 解析返回的 JSON 数据
 
-        if (response.ok) {
-            console.log('登录成功');
-            navigate('/home');
-        } else {
-            // 处理登录失败逻辑
-            console.log('登录失败');
-            window.alert('登录失败，请检查用户名和密码并重试。');
-        }
-    };
+      if (response.ok) {
+          console.log('登录成功');
+          const userPermission = responseData.permission;
+          navigate('/home', { state: { userPermission } }); // 跳转到系统首页
+      } else {
+          console.log('登录失败');
+          window.alert(responseData.message);
+          
+      }
+  };
 
   return (
     <ThemeProvider theme={defaultTheme}>

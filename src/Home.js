@@ -11,12 +11,12 @@ import GroupsIcon from '@mui/icons-material/Groups';
 import RecommendIcon from '@mui/icons-material/Recommend';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import LockPersonIcon from '@mui/icons-material/LockPerson';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import CustomerManagement from './CustomerManagement';
 import CustomerService from './CustomerService';
 import ProductRecommendation from './ProductRecommendation';
 import DataVisualization from './DataVisualization';
-import AuthorityManagement from './AuthorityManagement';
+import PermissionManagement from './PermissionManagement';
 
 const drawerWidth = 240;
 
@@ -64,28 +64,33 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
   }),
 );
 
-// TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme();
 
 export default function Home() {
-  const [open, setOpen] = React.useState(false);
-  const [selectedPage, setSelectedPage] = React.useState(1);
+  const [open, setOpen] = React.useState(false); // 打开旁边的导航栏
+  const [selectedPage, setSelectedPage] = React.useState(1); // 记住现在显示的界面，一开始默认客户管理界面
   const navigate = useNavigate();
-
+  const location = useLocation();
+  const userPermission = location.state.userPermission;
+  
+  // 打开或关闭旁边的导航栏
   const toggleDrawer = () => {
     setOpen(!open);
   };
 
+  // 处理登出
   const handleLogOut = () => {
-    navigate('../login');
+    navigate('../login', { replace: true });
   };
 
+  // 处理导航栏中被点击的按钮
   const handleListItemButtonClick = (buttonId) => {
-    console.log('Item clicked:', buttonId);
+    // console.log('Item clicked:', buttonId);
     setSelectedPage(buttonId);
     setOpen(false);
   };
 
+  // 导航栏的主要内容
   const mainListItems = (
     <React.Fragment>
       <ListItemButton onClick={() => handleListItemButtonClick(1)} sx={selectedPage === 1 ? { backgroundColor: '#e0e0e0' } : {}}>
@@ -115,6 +120,7 @@ export default function Home() {
     </React.Fragment>
   );
   
+  // 导航栏的次要内容，若登陆的是高级用户，则显示
   const secondaryListItems = (
     <React.Fragment>
       <ListItemButton onClick={() => handleListItemButtonClick(5)} sx={selectedPage === 5 ? { backgroundColor: '#e0e0e0' } : {}}>
@@ -140,7 +146,7 @@ export default function Home() {
               edge="start"
               color="inherit"
               aria-label="open drawer"
-              onClick={toggleDrawer}
+              onClick={toggleDrawer} 
               sx={{
                 marginRight: '36px',
                 ...(open && { display: 'none' }),
@@ -186,16 +192,17 @@ export default function Home() {
           <List component="nav">
             {mainListItems}
             <Divider sx={{ my: 1 }} />
-            {secondaryListItems}
+            {/* 根据用户权限级别显示这部分的内容 */}
+            {userPermission === 1 && secondaryListItems}
           </List>
         </Drawer>
         <Box
           component="main"
           sx={{
-            backgroundColor: (theme) =>
-              theme.palette.mode === 'light'
-                ? theme.palette.grey[100]
-                : theme.palette.grey[900],
+            // backgroundColor: (theme) =>
+            //   theme.palette.mode === 'light'
+            //     ? theme.palette.grey[100]
+            //     : theme.palette.grey[900],
             flexGrow: 1,
             height: '100vh',
             overflow: 'auto',
@@ -203,11 +210,12 @@ export default function Home() {
         >
           <Toolbar />
           <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+            {/* 根据导航栏中选中的来显示这部分界面 */}
             {selectedPage === 1 && (<CustomerManagement/>)}
             {selectedPage === 2 && (<CustomerService/>)}
             {selectedPage === 3 && (<ProductRecommendation/>)}
             {selectedPage === 4 && (<DataVisualization/>)}
-            {selectedPage === 5 && (<AuthorityManagement/>)}
+            {selectedPage === 5 && (<PermissionManagement/>)}
           </Container>
         </Box>
       </Box>
