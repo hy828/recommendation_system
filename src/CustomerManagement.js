@@ -1,7 +1,18 @@
 import * as React from 'react';
 import { createTheme, ThemeProvider, styled, alpha } from '@mui/material/styles';
 import SearchIcon from '@mui/icons-material/Search';
-import { Box, CssBaseline, InputBase, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
+import { Box, CssBaseline, InputBase, Table, TableBody, TableCell, TableHead, TableRow, Typography, Button } from '@mui/material';
+
+import Dialog from '@mui/material/Dialog';
+import ListItemText from '@mui/material/ListItemText';
+import ListItemButton from '@mui/material/ListItemButton';
+import List from '@mui/material/List';
+import Divider from '@mui/material/Divider';
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
+import Slide from '@mui/material/Slide';
 
 const defaultTheme = createTheme();
 
@@ -47,47 +58,53 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-function createData(id, date, name, shipTo, paymentMethod, amount) {
-  return { id, date, name, shipTo, paymentMethod, amount };
-}
-
-const rows = [
-  createData(
-    0,
-    '16 Mar, 2019',
-    'Elvis Presley',
-    'Tupelo, MS',
-    'VISA ⠀•••• 3719',
-    312.44,
-  ),
-  createData(
-    1,
-    '16 Mar, 2019',
-    'Paul McCartney',
-    'London, UK',
-    'VISA ⠀•••• 2574',
-    866.99,
-  ),
-  createData(2, '16 Mar, 2019', 'Tom Scholz', 'Boston, MA', 'MC ⠀•••• 1253', 100.81),
-  createData(
-    3,
-    '16 Mar, 2019',
-    'Michael Jackson',
-    'Gary, IN',
-    'AMEX ⠀•••• 2000',
-    654.39,
-  ),
-  createData(
-    4,
-    '15 Mar, 2019',
-    'Bruce Springsteen',
-    'Long Branch, NJ',
-    'VISA ⠀•••• 5919',
-    212.79,
-  ),
-];
-
 export default function CustomerManagement() {
+  const [rows, setRows] = React.useState([]);
+  const [detail, setDetail] = React.useState(null); 
+
+  React.useEffect(() => {
+    // 在组件加载时发送请求获取数据
+    fetchData();
+  }, []); // 空数组表示只在组件加载时执行一次
+
+  // 获取用户数据
+  const fetchData = async () => {
+    try {
+      const response = await fetch('http://127.0.0.1:5000/customerManagement/queryAllCustomers');
+      if (!response.ok) {
+        throw new Error('无法获取用户数据');
+      }
+      const data = await response.json();
+      const customers = data.customers
+      // console.log(users)
+      setRows(customers); // 设置数据到state中
+    } catch (error) {
+      console.error('用户数据获取失败:', error);
+    }
+  };
+
+  // 获取用户数据
+  const fetchDetail = async (id) => {
+    try {
+      const response = await fetch('http://127.0.0.1:5000/customerManagement/queryDetail', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id }),
+      });
+      if (!response.ok) {
+        throw new Error('无法获取用户数据');
+      }
+      const data = await response.json();
+      const detail = data.detail
+      // console.log(users)
+      setDetail(detail);
+    } catch (error) {
+      console.error('用户数据获取失败:', error);
+    }
+  };
+
   return (
     <ThemeProvider theme={defaultTheme}>
       <Box sx={{ mt: 2, padding: 1 }}>
@@ -108,20 +125,26 @@ export default function CustomerManagement() {
           <TableHead>
             <TableRow>
               <TableCell>ID</TableCell>
-              <TableCell>名称</TableCell>
-              <TableCell>成立天数</TableCell>
-              <TableCell>企业日期</TableCell>
+              <TableCell sx={{ flexGrow: 1 }}>名称</TableCell>
+              <TableCell>客户类型</TableCell>
+              <TableCell>企业规模名称</TableCell>
+              <TableCell>企业规模</TableCell>
+              <TableCell>行业门类</TableCell>
               <TableCell align="right"></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {rows.map((row) => (
               <TableRow key={row.id}>
-                <TableCell>{row.date}</TableCell>
-                <TableCell>{row.name}</TableCell>
-                <TableCell>{row.shipTo}</TableCell>
-                <TableCell>{row.paymentMethod}</TableCell>
-                <TableCell align="right">编辑</TableCell>
+                <TableCell>{row.id}</TableCell>
+                <TableCell sx={{ flexGrow: 1 }}>{row.name}</TableCell>
+                <TableCell>{row.khlx}</TableCell>
+                <TableCell>{row.qygmmc}</TableCell>
+                <TableCell>{row.scale}</TableCell>
+                <TableCell>{row.industry_top}</TableCell>
+                <TableCell align="right">
+                  <Button variant="text">查看</Button>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>

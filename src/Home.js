@@ -72,7 +72,8 @@ export default function Home() {
   const navigate = useNavigate();
   const location = useLocation();
   const userPermission = location.state.userPermission;
-  
+  const userId = location.state.username;
+
   // 打开或关闭旁边的导航栏
   const toggleDrawer = () => {
     setOpen(!open);
@@ -212,7 +213,7 @@ export default function Home() {
           <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
             {/* 根据导航栏中选中的来显示这部分界面 */}
             {selectedPage === 1 && (<CustomerManagement/>)}
-            {selectedPage === 2 && (<CustomerService/>)}
+            {selectedPage === 2 && (<CustomerService userId={userId} />)}
             {selectedPage === 3 && (<ProductRecommendation/>)}
             {selectedPage === 4 && (<DataVisualization/>)}
             {selectedPage === 5 && (<PermissionManagement/>)}

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { createTheme, ThemeProvider, styled, alpha } from '@mui/material/styles';
 import SearchIcon from '@mui/icons-material/Search';
-import { Stack, Button, Box, CssBaseline, InputBase, Table, TableBody, TableCell, TableHead, TableRow, Typography, TextField, Dialog, DialogActions, DialogContent, DialogTitle, Grid } from '@mui/material';
+import { Stack, Button, Box, CssBaseline, InputBase, Table, TableBody, TableCell, TableHead, TableRow, Typography, TextField, Dialog, DialogActions, DialogContent, DialogTitle, Grid, IconButton, MenuItem } from '@mui/material';
 
 const defaultTheme = createTheme();
 
@@ -49,46 +49,6 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 const today = new Date();
 const formattedDate = today.toISOString().split('T')[0];
-
-function createData(id, date, name, shipTo, paymentMethod, amount) {
-  return { id, date, name, shipTo, paymentMethod, amount };
-}
-
-const rows = [
-  createData(
-    0,
-    '16 Mar, 2019',
-    'Elvis Presley',
-    'Tupelo, MS',
-    'VISA ⠀•••• 3719',
-    312.44,
-  ),
-  createData(
-    1,
-    '16 Mar, 2019',
-    'Paul McCartney',
-    'London, UK',
-    'VISA ⠀•••• 2574',
-    866.99,
-  ),
-  createData(2, '16 Mar, 2019', 'Tom Scholz', 'Boston, MA', 'MC ⠀•••• 1253', 100.81),
-  createData(
-    3,
-    '16 Mar, 2019',
-    'Michael Jackson',
-    'Gary, IN',
-    'AMEX ⠀•••• 2000',
-    654.39,
-  ),
-  createData(
-    4,
-    '15 Mar, 2019',
-    'Bruce Springsteen',
-    'Long Branch, NJ',
-    'VISA ⠀•••• 5919',
-    212.79,
-  ),
-];
 
 function RecordDialog({ open, handleClose }) {
   return (
@@ -308,9 +268,190 @@ function ReminderDialog({ open, handleClose }) {
   );
 }
 
-export default function CustomerManagement() {
+function CustomerDialog({ open, onClose, tableData }) {
+  const [selectedRow, setSelectedRow] = React.useState(null);
+
+  const handleRowClick = (row) => {
+    setSelectedRow(row);
+  };
+
+  const handleClose = () => {
+    onClose(selectedRow); // 将选中的行数据传递给 onClose 回调函数
+  };
+
+  return (
+    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+      <DialogTitle>客户</DialogTitle>
+      <DialogContent>
+        <Table stickyHeader >
+          <TableHead>
+            <TableRow>
+              <TableCell>ID</TableCell>
+              <TableCell>名称</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {tableData.map((row) => (
+              <TableRow hover key={row.id} onClick={() => handleRowClick(row)} sx={{ cursor: 'pointer' }}>
+                <TableCell>{row.id}</TableCell>
+                <TableCell>{row.name}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={handleClose}>确定</Button>
+        <Button onClick={onClose}>取消</Button>
+      </DialogActions>
+    </Dialog>
+  );
+}
+
+function EditDialog({ open, handleClose, row, fetchData }) {
+
+  const [openDialog, setOpenDialog] = React.useState(false);
+  const [customerData, setCustomerData] = React.useState([]);
+  const [selectedCustomer, setSelectedCustomer] = React.useState(null);
+
+  const resultOptions = [
+    {
+      value: '无意向',
+      label: '无意向',
+    },
+    {
+      value: '有意向',
+      label: '有意向',
+    },
+    {
+      value: '已购买',
+      label: '已购买',
+    },
+  ];
+
+  // 向后端发送请求，修改用户权限
+  const handleSubmit = async (event) => {
+    event.preventDefault(); // 阻止表单默认提交行为
+    const formData = new FormData(event.currentTarget); // 获取表单数据
+    const date = formData.get('date');
+    const cid = formData.get('customername');
+    const uid = formData.get('name');
+    const pid = formData.get('product');
+    const content = formData.get('content');
+    const result = formData.get('result');
+
+    try {
+      const response = await fetch('http://127.0.0.1:5000/customerService/updateRecord', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          'sid': row.sid,
+          'date': date,
+          'cid': cid,
+          'uid': uid,
+          'pid': pid,
+          'content': content,
+          'result': result,
+        }),
+      });
+      if (!response.ok) {
+        throw new Error('更新权限失败');
+      }
+      // 更新权限后关闭对话框并触发更新表格的操作
+      fetchData();
+      handleClose();
+    } catch (error) {
+      console.error('更新权限失败:', error);
+    }
+  };
+
+  const handleSearchClick = async () => {
+    // 发送请求到后端，获取数据并设置到表格中
+    try {
+      const response = await fetch('http://127.0.0.1:5000/customerService/queryCustomers');
+      if (!response.ok) {
+        throw new Error('无法获取用户数据');
+      }
+      const data = await response.json();
+      const customers = data.customers
+      setCustomerData(customers);
+      console.log(customerData);
+      setOpenDialog(true); // 显示 Dialog
+    } catch (error) {
+      console.error('用户数据获取失败:', error);
+    }
+  };
+
+  const handleCloseDialog = (row) => {
+    setOpenDialog(false);
+    setSelectedCustomer(row);
+  };
+
+  return (
+    <Dialog open={open} onClose={handleClose} maxWidth="lg" fullWidth PaperProps={{
+        component: 'form', onSubmit: handleSubmit }}>
+      <DialogTitle>修改记录</DialogTitle>
+      <DialogContent>
+        <Grid container columnSpacing={8} sx={{ display: 'flex', justifyContent: 'center' }}>
+          <Grid item xs={10}>
+            <TextField required fullWidth margin="dense" id="date" type="date" variant="standard" />
+          </Grid>
+          <Grid item xs={5}>
+            <Stack direction="row">
+              <TextField autoFocus required fullWidth margin="dense" id="customerName" label="客户名称" type="text" variant="standard" defaultValue={row.customername} />
+              <IconButton onClick={handleSearchClick}>
+                <SearchIcon />
+              </IconButton>
+              <CustomerDialog open={openDialog} onClose={handleCloseDialog} tableData={customerData} />
+            </Stack>
+          </Grid>
+          <Grid item xs={5}>
+            <Stack direction="row">
+              <TextField required fullWidth margin="dense" id="username" label="负责人" type="text" variant="standard" defaultValue={row.name} />
+              <IconButton>
+                <SearchIcon />
+              </IconButton>
+            </Stack>
+          </Grid>
+          <Grid item xs={5}>
+            <Stack direction="row">
+              <TextField required fullWidth margin="dense" id="item" label="产品功能" type="text" variant="standard" defaultValue={row.product} />
+              <IconButton>
+                <SearchIcon />
+              </IconButton>
+            </Stack>
+          </Grid>
+          <Grid item xs={5}>
+            <TextField required select fullWidth margin="dense"
+              id="result" label="结果" variant="standard" defaultValue={row.result}>
+              {resultOptions.map((option) => (
+                <MenuItem key={option.value} value={option.value}>
+                  {option.label}
+                </MenuItem>
+              ))}
+          </TextField>
+          </Grid>
+          <Grid item xs={10}>
+            <TextField fullWidth margin="dense" id="content" label="内容" type="text" variant="standard" defaultValue={row.content} />
+          </Grid>
+        </Grid>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={handleClose}>取消</Button>
+        <Button type="submit">完成</Button>
+      </DialogActions>
+    </Dialog>
+  );
+}
+
+export default function CustomerService(props) {
   const [openRecordDialog, setOpenRecordDialog] = React.useState(false);
   const [openReminderDialog, setOpenReminderDialog] = React.useState(false);
+  const [openEditDialog, setOpenEditDialog] = React.useState(false);
+  const [rows, setRows] = React.useState([]);
+  const userId = props.userId;
 
   const handleOpenRecordDialog = () => {
     setOpenRecordDialog(true);
@@ -327,6 +468,37 @@ export default function CustomerManagement() {
   const handleCloseReminderDialog = () => {
     setOpenReminderDialog(false);
   };
+
+  const handleOpenEditDialog = (row) => {
+    setOpenEditDialog(true);
+  };
+
+  const handleCloseEditDialog = () => {
+    setOpenEditDialog(false);
+  };
+
+  React.useEffect(() => {
+    // 在组件加载时发送请求获取数据
+    fetchData();
+  }, []); // 空数组表示只在组件加载时执行一次
+
+  // 获取用户数据
+  const fetchData = async () => {
+    try {
+      const response = await fetch('http://127.0.0.1:5000/customerService/queryAllRecords');
+      if (!response.ok) {
+        throw new Error('无法获取用户数据');
+      }
+      const data = await response.json();
+      const records = data.records
+      // console.log(users)
+      console.log(userId);
+      setRows(records); // 设置数据到state中
+    } catch (error) {
+      console.error('用户数据获取失败:', error);
+    }
+  };
+
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -358,18 +530,30 @@ export default function CustomerManagement() {
               <TableCell>日期</TableCell>
               <TableCell>客户名称</TableCell>
               <TableCell>负责人</TableCell>
-              <TableCell>事项</TableCell>
+              <TableCell>产品功能</TableCell>
               <TableCell>内容</TableCell>
+              <TableCell>结果</TableCell>
+              <TableCell align="right"></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {rows.map((row) => (
-              <TableRow key={row.id}>
+              <TableRow key={row.sid}>
                 <TableCell>{row.date}</TableCell>
+                <TableCell>{row.customername}</TableCell>
                 <TableCell>{row.name}</TableCell>
-                <TableCell>{row.shipTo}</TableCell>
-                <TableCell>{row.paymentMethod}</TableCell>
-                <TableCell>{`$${row.amount}`}</TableCell>
+                <TableCell>{row.product}</TableCell>
+                <TableCell>{row.content}</TableCell>
+                <TableCell>{row.result}</TableCell>
+                <TableCell align="right">
+                  {
+                    row.uid === userId &&
+                    <Box>
+                      <Button variant="text" onClick={() => handleOpenEditDialog()}>修改</Button>
+                      <EditDialog open={openEditDialog} handleClose={handleCloseEditDialog} row={row} fetchData={fetchData} />
+                    </Box>
+                  }
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>

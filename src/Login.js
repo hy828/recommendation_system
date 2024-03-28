@@ -28,7 +28,7 @@ export default function Login() {
       if (response.ok) {
           console.log('登录成功');
           const userPermission = responseData.permission;
-          navigate('/home', { state: { userPermission } }); // 跳转到系统首页
+          navigate('/home', { state: { userPermission, username } }); // 跳转到系统首页
       } else {
           console.log('登录失败');
           window.alert(responseData.message);
