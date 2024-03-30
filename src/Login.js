@@ -14,25 +14,26 @@ export default function Login() {
       event.preventDefault();
       const username = new FormData(event.currentTarget).get('username');
       const password = new FormData(event.currentTarget).get('password');
-      // console.log({ username, password});
-      const response = await fetch('http://127.0.0.1:5000/login', {
+      console.log('登录界面-用户名和密码：', {username, password});
+      const response = await fetch('http://127.0.0.1:5000/users/login', {
           method: 'POST',
           headers: {
               'Content-Type': 'application/json',
           },
           body: JSON.stringify({ username, password }),
       });
-      // console.log({response})
       const responseData = await response.json(); // 解析返回的 JSON 数据
 
       if (response.ok) {
           console.log('登录成功');
-          const userPermission = responseData.permission;
-          navigate('/home', { state: { userPermission, username } }); // 跳转到系统首页
+          localStorage.setItem("token", responseData.token);
+          localStorage.setItem("userPermission", responseData.userPermission);
+          console.log('登录界面-userPermission：', localStorage.getItem("userPermission"));
+          navigate('/home'); // 跳转到系统首页
+          window.alert(responseData.message);
       } else {
           console.log('登录失败');
           window.alert(responseData.message);
-          
       }
   };
 

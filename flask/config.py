@@ -1,4 +1,4 @@
-# jwt_secret_key = "gumi"
+jwt_secret_key = "rec"
 
 DIALECT = 'mysql'
 DRIVER = 'pymysql'

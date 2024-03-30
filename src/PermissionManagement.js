@@ -1,7 +1,8 @@
 import * as React from 'react';
 import { createTheme, ThemeProvider, styled, alpha } from '@mui/material/styles';
 import SearchIcon from '@mui/icons-material/Search';
-import { Box, CssBaseline, InputBase, Table, TableBody, TableCell, TableHead, TableRow, Typography, Dialog, DialogActions, DialogContent, DialogTitle, Button, TextField, Stack, Radio, FormControlLabel, RadioGroup, FormControl, FormLabel } from '@mui/material';
+import { Box, CssBaseline, InputBase, Table, TableBody, TableCell, TableHead, TableRow, Dialog, DialogActions, DialogContent, DialogTitle, Button, TextField, Stack, Radio, FormControlLabel, RadioGroup } from '@mui/material';
+import NavigationBar from './NavigationBar';
 
 const defaultTheme = createTheme();
 
@@ -57,22 +58,25 @@ function EditDialog({ open, handleClose, permission, username, fetchData }) {
 
   // 向后端发送请求，修改用户权限
   const handleConfirm = async () => {
-    try {
-      const response = await fetch('http://127.0.0.1:5000/permission/updatePermission', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username }),
-      });
-      if (!response.ok) {
-        throw new Error('更新权限失败');
-      }
+    const response = await fetch('http://127.0.0.1:5000/permission/updatePermission', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ username }),
+    });
+    const responseData = await response.json(); // 解析返回的 JSON 数据
+
+    if (response.ok) {
+      console.log(username,'权限更新成功');
       // 更新权限后关闭对话框并触发更新表格的操作
       fetchData();
-      handleClose();
-    } catch (error) {
-      console.error('更新权限失败:', error);
+      handleClose(); // 关闭对话框
+      window.alert(responseData.message);
+    } else {
+      console.log(username,'权限更新失败');
+      // 显示错误信息
+      window.alert(responseData.message);
     }
   };
 
@@ -104,33 +108,28 @@ function AddDialog({ open, handleClose, fetchData }) {
       return;
     }
 
-    try {
-      const response = await fetch('http://127.0.0.1:5000/permission/addUser', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          'id': id,
-          'name': name,
-          'permission': permission,
-          'password': password,
-        }),
-      });
+    const response = await fetch('http://127.0.0.1:5000/permission/addUser', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        'id': id,
+        'name': name,
+        'permission': permission,
+        'password': password,
+      }),
+    });
 
-      if (response.ok) {
-        // 处理提交成功的逻辑
-        console.log('用户添加成功');
-        fetchData();
-        handleClose(); // 关闭对话框
-      } else {
-        // 处理提交失败的逻辑
-        console.error('用户添加失败');
-        // 显示错误信息或者其他处理
-      }
-    } catch (error) {
-      console.error('用户添加失败:', error);
-      // 处理异常情况
+    if (response.ok) {
+      // 处理提交成功的逻辑
+      console.log('用户添加成功');
+      fetchData();
+      handleClose(); // 关闭对话框
+    } else {
+      // 处理提交失败的逻辑
+      console.log('用户添加失败');
+      // 显示错误信息或者其他处理
     }
   };
 
@@ -216,9 +215,6 @@ export default function PermissionManagement() {
           'Content-Type': 'application/json',
         },
       });
-      if (!response.ok) {
-        throw new Error('无法获取搜索内容');
-      }
       const data = await response.json();
       const users = data.users
       setRows(users);
@@ -268,11 +264,9 @@ export default function PermissionManagement() {
   
   return (
     <ThemeProvider theme={defaultTheme}>
-      <Box sx={{ mt: 2, padding: 1 }}>
-        <CssBaseline />
-        <Typography component="h2" variant="h5" sx={{ mb: 4 }}>
-          权限管理
-        </Typography>
+      <CssBaseline />
+      <NavigationBar />
+      <Box sx={{ margin: 5, paddingTop: 10 }}>
         <Stack direction="row" sx={{ flexGrow: 1, mb: 5 }}>
           <Search sx={{ flexGrow: 1 }}>
             <SearchIconWrapper>
@@ -288,7 +282,7 @@ export default function PermissionManagement() {
           <Button variant="contained" onClick={handleOpenAddDialog}>添加记录</Button>
           <AddDialog open={openAddDialog} handleClose={handleCloseAddDialog} fetchData={fetchData} />
         </Stack>
-        <Table size="small">
+        <Table size="small" stickyHeader >
           <TableHead>
             <TableRow>
               <TableCell>ID</TableCell>

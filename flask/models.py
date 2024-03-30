@@ -62,3 +62,4 @@ class Activation(db.Model):
     pid = db.Column(db.Integer, nullable=False, primary_key=True)
     start_date = db.Column(db.Date, nullable=False)
     end_date = db.Column(db.Date, nullable=False)
+    

@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 from models import User
 from exts import db
 from sqlalchemy import or_
+import bcrypt
 
 bp = Blueprint('permission', __name__)
 
@@ -52,7 +53,10 @@ def addUser():
     new_user = User()
     new_user.id = data.get('id')
     new_user.name = data.get('name')
-    new_user.password = data.get('password')
+    password = data.get('password').encode('utf-8')
+    encrypted_password = bcrypt.hashpw(password, bcrypt.gensalt())
+    print(encrypted_password)
+    new_user.password = encrypted_password
     new_user.permission = int(data.get('permission'))
     # 将新用户对象添加到数据库中
     db.session.add(new_user)

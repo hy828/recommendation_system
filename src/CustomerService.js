@@ -504,26 +504,12 @@ export default function CustomerService(props) {
     <ThemeProvider theme={defaultTheme}>
       <Box sx={{ mt: 2, padding: 1 }}>
         <CssBaseline />
-        <Typography component="h2" variant="h5" sx={{ mb: 4 }}>
-          客户服务
-        </Typography>
-        <Stack direction="row" sx={{ flexGrow: 1, mb: 5 }}>
-          <Search sx={{ flexGrow: 1 }}>
-            <SearchIconWrapper>
-              <SearchIcon />
-            </SearchIconWrapper>
-            <StyledInputBase
-              placeholder="Search…"
-              inputProps={{ 'aria-label': 'search' }}
-            />
-          </Search>
-          <Box>
-            <Button variant="contained" sx={{ mr: 3 }} onClick={handleOpenRecordDialog}>添加记录</Button>
-            <Button variant="contained" onClick={handleOpenReminderDialog}>添加待办事项</Button>
-            <RecordDialog open={openRecordDialog} handleClose={handleCloseRecordDialog} />
-            <ReminderDialog open={openReminderDialog} handleClose={handleCloseReminderDialog} />
-          </Box>
-        </Stack>
+        <Box>
+          <Button variant="contained" sx={{ mr: 3 }} onClick={handleOpenRecordDialog}>添加记录</Button>
+          <Button variant="contained" onClick={handleOpenReminderDialog}>添加待办事项</Button>
+          <RecordDialog open={openRecordDialog} handleClose={handleCloseRecordDialog} />
+          <ReminderDialog open={openReminderDialog} handleClose={handleCloseReminderDialog} />
+        </Box>
         <Table size="small">
           <TableHead>
             <TableRow>

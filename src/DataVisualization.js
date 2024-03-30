@@ -1,65 +1,123 @@
 import * as React from 'react';
-import * as echarts from 'echarts';
+import { Container, Stack, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import ReactEcharts from "echarts-for-react";
 
 export default function DataVisualization() {
-  const chartRef = React.useRef(null);
+  const [barChartOption, setBarChartOption] = React.useState({});
+  const [lineChartOption, setLineChartOption] = React.useState({});
 
   React.useEffect(() => {
-    const chart = echarts.init(chartRef.current);
-    const options = {
-      tooltip: {
-        trigger: 'item'
-      },
-      legend: {
-        top: '5%',
-        left: 'center'
-      },
-      series: [
-        {
-          name: 'Access From',
-          type: 'pie',
-          radius: ['40%', '70%'],
-          avoidLabelOverlap: false,
-          itemStyle: {
-            borderRadius: 10,
-            borderColor: '#fff',
-            borderWidth: 2
-          },
-          label: {
-            show: false,
-            position: 'center'
-          },
-          emphasis: {
-            label: {
-              show: true,
-              fontSize: 40,
-              fontWeight: 'bold'
-            }
-          },
-          labelLine: {
-            show: false
-          },
-          data: [
-            { value: 1048, name: 'Search Engine' },
-            { value: 735, name: 'Direct' },
-            { value: 580, name: 'Email' },
-            { value: 484, name: 'Union Ads' },
-            { value: 300, name: 'Video Ads' }
-          ]
-        }
-      ]
-    };
-    // Use the specified configuration and data to render the chart
-    chart.setOption(options);
-    // Clean up when the component is unmounted
-    return () => {
-      chart.dispose();
-    };
+    fetchData();
   }, []);
 
-    return (
-      <div ref={chartRef} style={{ width: '100%', height: '400px' }}>
-          {/* Chart will be rendered here */}
-      </div>
-    )
+  const fetchData = async () => {
+    try {
+      const today = new Date();
+      const month = (today.getMonth() + 1).toString().padStart(2, '0');
+      const day = today.getDate().toString().padStart(2, '0');
+      const formattedDate = `${today.getFullYear()}-${month}-${day}`;
+
+      const queryParams = new URLSearchParams({
+        date: formattedDate,
+        range: 7,
+        pid: 13
+      });
+      const response = await fetch('http://127.0.0.1:5000/dataVisualization/getChartData?' + queryParams.toString());
+      if (!response.ok) {
+        throw new Error('无法获取用户数据');
+      }
+      const data = await response.json();
+
+      const barChartData = data.result1;
+      const lineChartData = data.result2;
+
+      const bar = {
+        title: {
+          text: '产品功能销售情况',
+          subtext: formattedDate
+        },
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: {
+            type: 'shadow'
+          }
+        },
+        xAxis: {
+          type: 'category',
+          axisLabel: {  // Ensure xAxis labels are hidden
+            show: false
+          },
+          data: barChartData.map(item => item.name),
+        },
+        yAxis: {
+          type: 'value'
+        },
+        series: [
+          {
+            type: 'bar',
+            data: barChartData.map(item => item.value)
+          }
+        ]
+      };
+      
+      const line = {
+        title: {
+          text: '产品功能近期销售情况'
+        },
+        tooltip: {
+          trigger: 'axis',
+        },
+        xAxis: {
+          type: 'category',
+          data: lineChartData.map(item => item.name)
+        },
+        yAxis: {
+          type: 'value'
+        },
+        series: [
+          {
+            data: lineChartData.map(item => item.value),
+            type: 'line'
+          }
+        ]
+      };
+      setBarChartOption(bar);
+      setLineChartOption(line);
+    } catch (error) {
+      console.error('用户数据获取失败:', error);
+    }
+  };
+
+  return (
+    <Container sx={{ margin: 5, paddingTop: 7 }}>
+      <Stack fullWidth direction="row" sx={{ mb:5 }}>
+        {/* <DatePicker
+          label="Controlled picker"
+          // value={value}
+          // onChange={(newValue) => setValue(newValue)}
+          sx={{ width: "50%" }}
+        /> */}
+        <FormControl sx={{ width: "50%" }}>
+          <InputLabel id="demo-simple-select-label">Age</InputLabel>
+          <Select
+            labelId="demo-simple-select-label"
+            id="demo-simple-select"
+            // value={age}
+            label="Age"
+            // onChange={handleChange}
+          >
+            <MenuItem value={10}>Ten</MenuItem>
+            <MenuItem value={20}>Twenty</MenuItem>
+            <MenuItem value={30}>Thirty</MenuItem>
+          </Select>
+        </FormControl>
+      </Stack>
+      <Stack fullWidth direction="row">
+        <ReactEcharts option={barChartOption} style={{ height: "400px", width: "50%" }}/>
+        <ReactEcharts option={lineChartOption} style={{ height: "400px", width: "50%" }}/>
+      </Stack>
+    </Container>
+      
+  );
 }
