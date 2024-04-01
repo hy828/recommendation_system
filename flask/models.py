@@ -63,3 +63,7 @@ class Activation(db.Model):
     start_date = db.Column(db.Date, nullable=False)
     end_date = db.Column(db.Date, nullable=False)
     
+class Description(db.Model):
+    __tablename__ = "description"
+    id = db.Column(db.String(20), nullable=False, primary_key=True)
+    name = db.Column(db.String(20), nullable=False)

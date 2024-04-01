@@ -97,13 +97,12 @@ export default function NavigationBar() {
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const [openDialog, setOpenDialog] = React.useState(false);
   const navigate = useNavigate();
-  const pages = ['首页', '搜索', '权限管理'];
+  const pages = ['首页', '搜索', '跟进管理', '用户管理'];
   const settings = ['修改密码', '登出'];
-  const userPermission = localStorage.getItem("userPermission")
 
   // 处理页面跳转
   const handlePageClick = (page) => {
-    if (page === '权限管理') {
+    if (page === '用户管理') {
       navigate('/permission');
     } else if (page === '搜索') {
       navigate('/search');
@@ -113,6 +112,8 @@ export default function NavigationBar() {
       localStorage.removeItem("userPermission");
       localStorage.removeItem("token");
       navigate('../login', { replace: true });
+    } else if (page === '跟进管理') {
+      navigate('/service');
     } else {
       setOpenDialog(true);
     }
@@ -137,14 +138,11 @@ export default function NavigationBar() {
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
             {pages.map((page) => (
-              // 根据用户权限决定是否显示权限管理页面
-              (page === '权限管理' && userPermission === '1') || page !== '权限管理') ? (
-                <Button key={page} sx={{ my: 2, color: 'white', display: 'block' }}
-                  onClick={() => handlePageClick(page)}>
-                  {page}
-                </Button>
-              ) :  <div />
-            )}
+              <Button key={page} sx={{ my: 2, color: 'white', display: 'block' }}
+                onClick={() => handlePageClick(page)}>
+                {page}
+              </Button>
+            ))}
           </Box>
 
           <Box sx={{ flexGrow: 0 }}>

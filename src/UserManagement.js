@@ -1,10 +1,8 @@
 import * as React from 'react';
-import { createTheme, ThemeProvider, styled, alpha } from '@mui/material/styles';
+import { styled, alpha } from '@mui/material/styles';
 import SearchIcon from '@mui/icons-material/Search';
-import { Box, CssBaseline, InputBase, Table, TableBody, TableCell, TableHead, TableRow, Dialog, DialogActions, DialogContent, DialogTitle, Button, TextField, Stack, Radio, FormControlLabel, RadioGroup } from '@mui/material';
+import { Box, CssBaseline, InputBase, Table, TableBody, TableCell, TableHead, TableRow, Dialog, DialogActions, DialogContent, DialogTitle, Button, TextField, Stack, Radio, FormControlLabel, RadioGroup, Paper, TableContainer } from '@mui/material';
 import NavigationBar from './NavigationBar';
-
-const defaultTheme = createTheme();
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -196,25 +194,21 @@ function AddDialog({ open, handleClose, fetchData }) {
   );
 }
 
-export default function PermissionManagement() {
+export default function UserManagement() {
   const [rows, setRows] = React.useState([]);
   const [openEditDialog, setOpenEditDialog] = React.useState(false);
   const [openAddDialog, setOpenAddDialog] = React.useState(false);
   const [selectedUserPermission, setSelectedUserPermission] = React.useState(null);
   const [selectedUsername, setSelectedUsername] = React.useState(null);
   const [searchQuery, setSearchQuery] = React.useState('');
+  const userPermission = localStorage.getItem("userPermission")
 
   // 根据搜索框改变的内容实时更新表格
   const handleInputChange = async (event) => {
     const query = event.target.value; // 得到搜索框的内容
     setSearchQuery(query);
     try {
-      const response = await fetch('http://127.0.0.1:5000/permission/queryUser?query=' + encodeURIComponent(query), {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      const response = await fetch('http://127.0.0.1:5000/permission/queryUser?query=' + encodeURIComponent(query));
       const data = await response.json();
       const users = data.users
       setRows(users);
@@ -263,49 +257,79 @@ export default function PermissionManagement() {
   };
   
   return (
-    <ThemeProvider theme={defaultTheme}>
+    <Box>
       <CssBaseline />
       <NavigationBar />
-      <Box sx={{ margin: 5, paddingTop: 10 }}>
+      <Box  sx={{ mx: 10, pt: 15 }}>
         <Stack direction="row" sx={{ flexGrow: 1, mb: 5 }}>
-          <Search sx={{ flexGrow: 1 }}>
-            <SearchIconWrapper>
-              <SearchIcon onClick={handleInputChange} />
-            </SearchIconWrapper>
-            <StyledInputBase
-              placeholder="搜索..."
-              inputProps={{ 'aria-label': 'search' }}
-              value={searchQuery}
-              onChange={handleInputChange}
-            />
-          </Search>
-          <Button variant="contained" onClick={handleOpenAddDialog}>添加记录</Button>
+          <Paper sx={{ flexGrow: 1, px: 5, py: 0.5, mr: 5 }}>
+            <Search>
+              <SearchIconWrapper>
+                <SearchIcon onClick={handleInputChange} />
+              </SearchIconWrapper>
+              <StyledInputBase
+                placeholder="搜索..."
+                inputProps={{ 'aria-label': 'search' }}
+                value={searchQuery}
+                onChange={handleInputChange}
+              />
+            </Search>
+          </Paper>
+          <Button variant="contained" onClick={handleOpenAddDialog}>添加用户</Button>
           <AddDialog open={openAddDialog} handleClose={handleCloseAddDialog} fetchData={fetchData} />
         </Stack>
-        <Table size="small" stickyHeader >
-          <TableHead>
-            <TableRow>
-              <TableCell>ID</TableCell>
-              <TableCell>名字</TableCell>
-              <TableCell>权限级别</TableCell>
-              <TableCell align="right"></TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {rows.map((row) => (
-              <TableRow key={row.username}>
-                <TableCell>{row.username}</TableCell>
-                <TableCell>{row.name}</TableCell>
-                <TableCell>{row.permission === 0 ? '普通用户' : '高级用户'}</TableCell>
-                <TableCell align="right">
-                  <Button variant="text" onClick={() => handleOpenEditDialog(row.permission, row.username)}>修改权限</Button>
-                  <EditDialog open={openEditDialog} handleClose={handleCloseEditDialog} permission={selectedUserPermission} username={selectedUsername} fetchData={fetchData} />
-                </TableCell>
+        <TableContainer sx={{ maxHeight: 500 }} component={Paper}>
+          <Table stickyHeader>
+            {/* <TableHead>
+              <TableRow>
+                {headCells.map((headCell) => (
+                  <TableCell
+                    key={headCell.id}
+                    align={headCell.numeric ? 'right' : 'left'}
+                    padding={headCell.disablePadding ? 'none' : 'normal'}
+                    sortDirection={orderBy === headCell.id ? order : false}
+                  >
+                    <TableSortLabel
+                      active={orderBy === headCell.id}
+                      direction={orderBy === headCell.id ? order : 'asc'}
+                      onClick={createSortHandler(headCell.id)}
+                    >
+                      {headCell.label}
+                      {orderBy === headCell.id ? (
+                        <Box component="span" sx={visuallyHidden}>
+                          {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                        </Box>
+                      ) : null}
+                    </TableSortLabel>
+                  </TableCell>
+                ))}
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHead> */}
+            <TableHead>
+              <TableRow>
+                <TableCell>ID</TableCell>
+                <TableCell>名字</TableCell>
+                <TableCell>权限级别</TableCell>
+                <TableCell align="right"></TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {rows.map((row) => (
+                <TableRow key={row.username}>
+                  <TableCell>{row.username}</TableCell>
+                  <TableCell>{row.name}</TableCell>
+                  <TableCell>{row.permission === 0 ? '普通用户' : '高级用户'}</TableCell>
+                  <TableCell align="right">{ 
+                    userPermission === '1' &&
+                      <Button variant="text" onClick={() => handleOpenEditDialog(row.permission, row.username)}>修改权限</Button>
+                  }</TableCell>
+                </TableRow>
+              ))}
+              <EditDialog open={openEditDialog} handleClose={handleCloseEditDialog} permission={selectedUserPermission} username={selectedUsername} fetchData={fetchData} />
+            </TableBody>
+          </Table>
+        </TableContainer>
       </Box>
-    </ThemeProvider>
+    </Box>
   )
 }

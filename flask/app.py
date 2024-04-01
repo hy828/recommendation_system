@@ -6,6 +6,7 @@ from permission import bp as permission_bp
 from customerManagement import bp as customerManagement_bp
 from customerService import bp as customerService_bp
 from dataVisualization import bp as dataVisualization_bp
+from customerDetail import bp as customerDetail_bp
 import config
 
 app = Flask(__name__)
@@ -18,6 +19,7 @@ app.register_blueprint(permission_bp)
 app.register_blueprint(customerManagement_bp)
 app.register_blueprint(customerService_bp)
 app.register_blueprint(dataVisualization_bp)
+app.register_blueprint(customerDetail_bp)
 
 @app.route('/', methods=["GET", "POST"])
 def index():

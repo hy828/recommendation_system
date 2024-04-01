@@ -1,10 +1,7 @@
 import * as React from 'react';
 import { Avatar, Button, CssBaseline, TextField, Box, Typography, Container } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
-
-const defaultTheme = createTheme();
 
 export default function Login() {
   const navigate = useNavigate();
@@ -38,7 +35,7 @@ export default function Login() {
   };
 
   return (
-    <ThemeProvider theme={defaultTheme}>
+    <Box>
       <Container component="main" maxWidth="md">
         <CssBaseline />
         <Box
@@ -94,6 +91,6 @@ export default function Login() {
           </Box>
         </Box>
       </Container>
-    </ThemeProvider>
+    </Box>
   );
 }

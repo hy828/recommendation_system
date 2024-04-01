@@ -43,20 +43,18 @@ def getChartData():
         result2.append(record_data)
         # 更新日期为下一天
         current_date += timedelta(days=1)
-    print(result1)
-    print(result2)
+    # print(result1)
+    # print(result2)
     return jsonify({'result1': result1, 'result2': result2}), 200
 
-    # today = datetime.now().date()
-    # records = Activation.query.filter(Activation.start_date <= today, Activation.end_date >= today).all()
-    # pid_counter = Counter(record.pid for record in records)
-    # records_list = []
-    # for pid, count in pid_counter.items():
-    #     product = Product.query.filter_by(id=pid).first()
-    #     record_data = {
-    #         'name': product.name,
-    #         'value': count
-    #     }
-    #     records_list.append(record_data)
-    # print(records_list)
-    # return jsonify({'records': records_list}), 200
+@bp.route('/dataVisualization/getProductOptions', methods=['GET'])
+def getProductOptions():
+    products = Product.query.all()
+    products_list = []
+    for product in products:
+        product_data = {
+            'id': product.id,
+            'name': product.name,
+        }
+        products_list.append(product_data)
+    return jsonify({'products': products_list}), 200
