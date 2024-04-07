@@ -201,7 +201,7 @@ export default function UserManagement() {
   const [selectedUserPermission, setSelectedUserPermission] = React.useState(null);
   const [selectedUsername, setSelectedUsername] = React.useState(null);
   const [searchQuery, setSearchQuery] = React.useState('');
-  const userPermission = localStorage.getItem("userPermission")
+  const userPermission = localStorage.getItem("userPermission");
 
   // 根据搜索框改变的内容实时更新表格
   const handleInputChange = async (event) => {
@@ -309,6 +309,8 @@ export default function UserManagement() {
               <TableRow>
                 <TableCell>ID</TableCell>
                 <TableCell>名字</TableCell>
+                <TableCell>联系方式</TableCell>
+                <TableCell>电子邮件</TableCell>
                 <TableCell>权限级别</TableCell>
                 <TableCell align="right"></TableCell>
               </TableRow>
@@ -318,6 +320,8 @@ export default function UserManagement() {
                 <TableRow key={row.username}>
                   <TableCell>{row.username}</TableCell>
                   <TableCell>{row.name}</TableCell>
+                  <TableCell>{row.phone_number}</TableCell>
+                  <TableCell>{row.email}</TableCell>
                   <TableCell>{row.permission === 0 ? '普通用户' : '高级用户'}</TableCell>
                   <TableCell align="right">{ 
                     userPermission === '1' &&

@@ -15,6 +15,8 @@ def queryAllUsers(): # 获取所有用户数据
             'username': user.id,
             'name': user.name,
             'permission': user.permission,
+            'phone_number': user.phone_no,
+            'email': user.email,
         }
         users_list.append(user_data)
     return jsonify({'users': users_list}), 200

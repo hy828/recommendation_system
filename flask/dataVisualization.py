@@ -54,7 +54,7 @@ def getProductOptions():
     for product in products:
         product_data = {
             'id': product.id,
-            'name': product.name,
+            'label': product.name,
         }
         products_list.append(product_data)
     return jsonify({'products': products_list}), 200

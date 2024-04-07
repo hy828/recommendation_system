@@ -19,7 +19,7 @@ def queryAllCustomers():
             'industry_top': customer.industry_top,
         }
         customers_list.append(customer_data)
-    print(customers_list)
+    # print(customers_list)
     return jsonify({'customers': customers_list}), 200
 
 @bp.route('/customerManagement/advancedSearch', methods=['GET'])

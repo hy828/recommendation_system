@@ -27,7 +27,7 @@ def login(): # 处理登录
         }
         token = jwt.encode(payload=payload, key=jwt_secret_key, algorithm='HS256', headers=headers)
         print('登录成功')
-        return jsonify({'message': '登录成功', 'token': token, "userPermission": user.permission}), 200
+        return jsonify({'message': '登录成功', 'token': token, "userPermission": user.permission, "name": user.name}), 200
     else:
         print('登录失败，密码错误')
         return jsonify({'message': '密码错误'}), 400

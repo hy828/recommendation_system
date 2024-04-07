@@ -104,7 +104,7 @@ export default function Home() {
     <Box>
       <CssBaseline />
       <NavigationBar />
-      <Box  sx={{ mx: 10, pt: 12 }}>
+      <Box  sx={{ mx: 10, pt: 15 }}>
         <DataVisualization barChartOption={barChartOption} lineChartOption={lineChartOption} productOptions={productOptions} fetchData={fetchData}/>
       </Box>
     </Box>

@@ -6,6 +6,8 @@ class User(db.Model):
     password = db.Column(db.String(20), nullable=False)
     name = db.Column(db.String(20), nullable=False)
     permission = db.Column(db.Integer, nullable=False)
+    phone_no = db.Column(db.String(20), nullable=False)
+    email = db.Column(db.String(20), nullable=False)
 
 class Product(db.Model):
     __tablename__ = "product"

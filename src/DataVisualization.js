@@ -3,7 +3,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import ReactEcharts from "echarts-for-react";
 import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
-import { Container, Stack, FormControl, InputLabel, Select, MenuItem, TextField } from '@mui/material';
+import { Container, Stack, FormControl, InputLabel, Select, MenuItem, TextField, Paper, Autocomplete } from '@mui/material';
 
 export default function DataVisualization({ barChartOption, lineChartOption, productOptions, fetchData }) {
   const [selectedDate, setSelectedDate] = React.useState(null);
@@ -40,7 +40,7 @@ export default function DataVisualization({ barChartOption, lineChartOption, pro
   };
 
   return (
-    <Container>
+    <Container component={Paper} sx={{ p: 5 }}>
       <Stack fullWidth direction="row" sx={{ mb:5 }}>
         <Container sx={{ width: 1/2 }}>
           {/* <LocalizationProvider dateAdapter={AdapterDayjs} >
@@ -67,7 +67,22 @@ export default function DataVisualization({ barChartOption, lineChartOption, pro
           </Container>
           <Container sx={{ width: 0.7 }}>
             <FormControl sx={{ width: "90%" }}>
-              <InputLabel id="product">产品</InputLabel>
+              <Autocomplete
+                disablePortal
+                fullWidth
+                id="product"
+                name="product"
+                ListboxProps={{ style: { maxHeight: 250 } }}
+                options={productOptions}
+                defaultValue={1}
+                onChange={handleProductChange}
+                renderInput={(params) => 
+                <TextField {...params} 
+                  required
+                  margin="dense"
+                  label="产品"/>}
+              />
+              {/* <InputLabel id="product">产品</InputLabel>
               <Select
                 labelId="product"
                 id="product"
@@ -78,10 +93,10 @@ export default function DataVisualization({ barChartOption, lineChartOption, pro
               >
                 {productOptions ? 
                   (productOptions.map((productOption) => (
-                    <MenuItem value={productOption.id}>{productOption.name}</MenuItem>
+                    <MenuItem value={productOption.id}>{productOption.label}</MenuItem>
                   )))
                 : "Not loaded yet"}
-              </Select>
+              </Select> */}
             </FormControl>
           </Container>
         </Stack>

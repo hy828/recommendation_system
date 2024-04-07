@@ -1,139 +1,16 @@
 import * as React from 'react';
 import SearchIcon from '@mui/icons-material/Search';
-import { Stack, Button, Box, CssBaseline, Table, TableBody, TableCell, TableHead, TableRow, Paper, TextField, Dialog, DialogActions, DialogContent, DialogTitle, Grid, IconButton, MenuItem, Typography, TableContainer, List, ListItem, ListItemButton, ListItemText } from '@mui/material';
+import { Stack, Button, Box, CssBaseline, Table, TableBody, TableCell, TableHead, TableRow, Paper, TextField, Dialog, DialogActions, DialogContent, DialogTitle, Grid, IconButton, MenuItem, Typography, TableContainer, List, ListItem, ListItemButton, ListItemText, Autocomplete } from '@mui/material';
 import NavigationBar from './NavigationBar';
 
-function AddDialog({ open, handleClose }) {
+function AddDialog({ open, handleClose, products, customers, fetchData }) {
   const today = new Date();
   const formattedDate = today.toISOString().split('T')[0];
+  const name = localStorage.getItem("name");
 
-  return (
-    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth PaperProps={{ component: 'form' }}>
-      <DialogTitle>添加记录</DialogTitle>
-      <DialogContent>
-        <Grid container spacing={2}>
-          <Grid item xs={4}>
-            <TextField
-              autoFocus
-              required
-              margin="dense"
-              id="date"
-              name="date"
-              label="日期"
-              type="date"
-              fullWidth
-              variant="standard"
-              defaultValue={formattedDate}
-            />
-          </Grid>
-          <Grid item xs={4}>
-            <TextField
-              autoFocus
-              required
-              margin="dense"
-              id="customerName"
-              name="customerName"
-              label="客户名称"
-              type="text"
-              fullWidth
-              variant="standard"
-            />
-          </Grid>
-          <Grid item xs={4}>
-            <TextField
-              autoFocus
-              required
-              margin="dense"
-              id="username"
-              name="username"
-              label="负责人"
-              type="text"
-              fullWidth
-              variant="standard"
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              autoFocus
-              required
-              margin="dense"
-              id="item"
-              name="item"
-              label="事项"
-              type="text"
-              fullWidth
-              variant="standard"
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              autoFocus
-              required
-              margin="dense"
-              id="content"
-              name="content"
-              label="内容"
-              type="text"
-              fullWidth
-              variant="standard"
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              autoFocus
-              required
-              margin="dense"
-              id="result"
-              name="result"
-              label="结果"
-              type="text"
-              fullWidth
-              variant="standard"
-            />
-          </Grid>
-        </Grid>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={handleClose}>取消</Button>
-        <Button type="submit">完成</Button>
-      </DialogActions>
-    </Dialog>
-  );
-}
-
-function CustomerDialog({ open, onClose, tableData, selectedCustomer }) {
-
-  const handleClose = () => {
-    onClose(selectedCustomer);
-  };
-
-  const handleListItemClick = (value) => {
-    onClose(value);
-  };
-
-  return (
-    <Dialog onClose={handleClose} open={open} maxWidth="xs" fullWidth>
-      <DialogTitle>客户</DialogTitle>
-      <List sx={{ pt: 0 }}>
-        {tableData.map((row) => (
-          <ListItem disableGutters key={row.id}>
-            <ListItemButton onClick={() => handleListItemClick(row)}>
-              <ListItemText primary={row.id} />
-              <ListItemText primary={row.name} />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
-    </Dialog>
-  );
-}
-
-function EditDialog({ open, handleClose, row, fetchData, products }) {
-
-  const [openDialog, setOpenDialog] = React.useState(false);
-  const [customerData, setCustomerData] = React.useState([]);
-  const [selectedCustomer, setSelectedCustomer] = React.useState({});
-
+  const [cid, setCid] = React.useState(null);
+  const [pid, setPid] = React.useState(null);
+  const [result, setResult] = React.useState(null);
 
   const resultOptions = [
     {
@@ -150,22 +27,175 @@ function EditDialog({ open, handleClose, row, fetchData, products }) {
     },
   ];
 
-  const findResultByLabel = (label) => {
-    const result = resultOptions.find(option => option.label === label);
-    return result ? result.value : null; // 如果找到匹配的选项，则返回其对应的 value 值，否则返回 null
+  // React.useEffect(() => {console.log(result)}, []);
+
+  const handleSubmit = async (event) => {
+    event.preventDefault(); // 阻止表单默认提交行为
+    const formData = new FormData(event.currentTarget); // 获取表单数据
+    const date = formData.get('date');
+    const content = formData.get('content');
+
+    console.log(date, cid, pid, content, result);
+      const response = await fetch('http://127.0.0.1:5000/customerService/addRecord', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': localStorage.getItem("token")
+        },
+        body: JSON.stringify({
+          'date': date,
+          'cid': cid,
+          'pid': pid,
+          'content': content,
+          'result': result,
+        }),
+      });
+      const responseData = await response.json();
+      if (response.ok) {
+        console.log('记录添加成功');
+        fetchData();
+        handleClose();
+        window.alert(responseData.message);
+      } else {
+        console.log('记录添加失败');
+        window.alert(responseData.message);
+      }
   };
+
+  return (
+    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth PaperProps={{ component: 'form', onSubmit: handleSubmit }}>
+      <DialogTitle>添加记录</DialogTitle>
+      <DialogContent>
+        <Grid container columnSpacing={3} rowSpacing={1}>
+          <Grid item xs={12}>
+            <TextField
+              required
+              fullWidth
+              margin="dense"
+              name="date"
+              label="日期"
+              type="date"
+              variant="standard"
+              defaultValue={formattedDate}
+            />
+          </Grid>
+          <Grid item xs={8}>
+            <Autocomplete
+              disablePortal
+              fullWidth
+              ListboxProps={{ style: { maxHeight: 150 } }}
+              options={customers}
+              onChange={(event, option) => option ? setCid(option.id) : null}
+              renderInput={(params) => 
+              <TextField {...params} 
+                required
+                name="customerName"
+                margin="dense"
+                label="客户名称"
+                variant="standard"/>}
+            />
+          </Grid>
+          <Grid item xs={4}>
+            <TextField 
+              required 
+              fullWidth 
+              margin="dense"
+              name="username"
+              label="负责人" 
+              type="text" 
+              variant="standard" 
+              InputProps={{ readOnly: true }} 
+              defaultValue={name} 
+            />
+          </Grid>
+          <Grid item xs={8}>
+            <Autocomplete
+              disablePortal
+              fullWidth
+              ListboxProps={{ style: { maxHeight: 150 } }}
+              options={products}
+              onChange={(event, option) => option ? setPid(option.id) : null}
+              getOptionKey={(option) => option.id}
+              renderInput={(params) => 
+              <TextField {...params} 
+                required
+                name="product"
+                margin="dense"
+                label="产品"
+                variant="standard"/>}
+            />
+          </Grid>
+          <Grid item xs={4}>
+            <Autocomplete
+              disablePortal
+              fullWidth
+              ListboxProps={{ style: { maxHeight: 150 } }}
+              options={resultOptions}
+              onChange={(event, option) => option ? setResult(option.value) : null}
+              renderInput={(params) => 
+              <TextField {...params}
+                name="result"
+                margin="dense"
+                label="结果"
+                variant="standard"/>}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              fullWidth
+              multiline
+              rows={2}
+              margin="dense"
+              name="content"
+              label="内容"
+              type="text"
+              variant="standard"
+            />
+          </Grid>
+        </Grid>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={handleClose}>取消</Button>
+        <Button type="submit">完成</Button>
+      </DialogActions>
+    </Dialog>
+  );
+}
+
+function EditDialog({ open, handleClose, row, fetchData, products, customers, isRequired }) {
+
+  const resultOptions = [
+    {
+      value: 0,
+      label: '无意向',
+    },
+    {
+      value: 2,
+      label: '有意向',
+    },
+    {
+      value: 1,
+      label: '已购买',
+    },
+  ];
+
+  const [cid, setCid] = React.useState(row.cid);
+  const [pid, setPid] = React.useState(row.pid);
+  const [result, setResult] = React.useState(row.result ? (resultOptions.find(option => option.label === row.result)).value : null);
+  const name = localStorage.getItem("name");
+
+  // React.useEffect(() => {
+  //   console.log(cid);
+  // }, []);
 
   // 向后端发送请求，修改用户权限
   const handleSubmit = async (event) => {
     event.preventDefault(); // 阻止表单默认提交行为
     const formData = new FormData(event.currentTarget); // 获取表单数据
     const date = formData.get('date');
-    const cid = formData.get('customerName');
-    const pid = formData.get('product');
     const content = formData.get('content');
-    const result = formData.get('result');
 
-    console.log(date, cid, pid, content, result);
+    console.log('date:', date, 'cid:', cid, 'pid:', pid, 'content:', content, 'result:', result);
     // try {
     //   const response = await fetch('http://127.0.0.1:5000/customerService/updateRecord', {
     //     method: 'POST',
@@ -193,28 +223,6 @@ function EditDialog({ open, handleClose, row, fetchData, products }) {
     // }
   };
 
-  const handleSearchClick = async () => {
-    // 发送请求到后端，获取数据并设置到表格中
-    try {
-      const response = await fetch('http://127.0.0.1:5000/customerService/queryCustomers');
-      if (!response.ok) {
-        throw new Error('无法获取用户数据');
-      }
-      const data = await response.json();
-      const customers = data.customers
-      setCustomerData(customers);
-      console.log(customerData);
-      setOpenDialog(true); // 显示 Dialog
-    } catch (error) {
-      console.error('用户数据获取失败:', error);
-    }
-  };
-
-  const handleCloseDialog = (row) => {
-    setOpenDialog(false);
-    setSelectedCustomer(row);
-  };
-
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth PaperProps={{
         component: 'form', onSubmit: handleSubmit }}>
@@ -225,8 +233,7 @@ function EditDialog({ open, handleClose, row, fetchData, products }) {
             <TextField 
               required 
               fullWidth 
-              margin="dense" 
-              id="date" 
+              margin="dense"
               name="date" 
               label="日期" 
               type="date" 
@@ -235,82 +242,75 @@ function EditDialog({ open, handleClose, row, fetchData, products }) {
             />
           </Grid>
           <Grid item xs={8}>
-            <Box sx={{ display: 'flex', alignItems: 'flex-end' }}>
-              <TextField 
-                autoFocus 
-                required 
-                fullWidth 
-                margin="dense" 
-                id="customerName" 
-                name="customerName" 
-                label="客户名称" 
-                type="text" 
-                variant="standard" 
-                defaultValue={row.customerName}
-              >
-                {selectedCustomer.name}
-              </TextField>
-              <IconButton onClick={handleSearchClick} sx={{ mr: 1, my: 0.5 }}>
-                <SearchIcon />
-              </IconButton>
-              <CustomerDialog open={openDialog} onClose={handleCloseDialog} tableData={customerData} selectedCustomer={selectedCustomer}/>
-            </Box>
+            <Autocomplete
+              disablePortal
+              fullWidth
+              ListboxProps={{ style: { maxHeight: 150 } }}
+              options={customers}
+              value={row.customerName}
+              onChange={(event, option) => option ? setCid(option.id) : null}
+              renderInput={(params) => 
+              <TextField {...params}
+                required
+                name="customerName"
+                margin="dense"
+                label="客户名称"
+                variant="standard"/>}
+            />
           </Grid>
           <Grid item xs={4}>
             <TextField 
               required 
               fullWidth 
-              margin="dense" 
-              id="username" 
+              margin="dense"
               name="username" 
               label="负责人" 
               type="text" 
               variant="standard" 
-              InputProps={{ readOnly: true, }} 
-              defaultValue={row.username} 
+              InputProps={{ readOnly: true }} 
+              defaultValue={name} 
             />
           </Grid>
           <Grid item xs={8}>
-            <TextField 
-              required 
-              select 
-              fullWidth 
-              margin="dense"
-              id="product" 
-              name="product" 
-              label="产品" 
-              variant="standard" 
-              defaultValue={row.pid}
-            >
-              {(products.map((product) => (
-                <MenuItem key={product.id} value={product.id}>{product.name}</MenuItem>
-              )))}
-            </TextField>
+            <Autocomplete
+              disablePortal
+              fullWidth
+              ListboxProps={{ style: { maxHeight: 150 } }}
+              options={products}
+              defaultValue={row.product}
+              onChange={(event, option) => option ? setPid(option.id) : null}
+              renderInput={(params) => 
+              <TextField {...params} 
+                required
+                name="product"
+                margin="dense"
+                label="产品"
+                variant="standard"/>}
+            />
           </Grid>
           <Grid item xs={4}>
-            <TextField 
-              required 
-              select 
-              fullWidth 
-              margin="dense"
-              id="result" 
-              name="result" 
-              label="结果" 
-              variant="standard" 
-              defaultValue={findResultByLabel(row.result)}
-            >
-              {resultOptions.map((option) => (
-                <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>
-              ))}
-            </TextField>
+            <Autocomplete
+              disablePortal
+              fullWidth
+              ListboxProps={{ style: { maxHeight: 150 } }}
+              options={resultOptions}
+              onChange={(event, option) => option ? setResult(option.value) : null}
+              defaultValue={row.result}
+              renderInput={(params) => 
+              <TextField {...params} 
+                required={isRequired}
+                name="result"
+                margin="dense"
+                label="结果"
+                variant="standard"/>}
+            />
           </Grid>
           <Grid item xs={12}>
             <TextField 
               fullWidth 
               multiline 
               rows={2} 
-              margin="dense" 
-              id="content" 
+              margin="dense"
               name="content" 
               label="内容" 
               type="text" 
@@ -328,7 +328,7 @@ function EditDialog({ open, handleClose, row, fetchData, products }) {
   );
 }
 
-function ConfirmDialog({ open, handleClose, row }) {
+function ConfirmDialog({ open, handleClose, row, fetchData }) {
   const sid = row.sid;
 
   const handleConfirm = async () => {
@@ -343,6 +343,7 @@ function ConfirmDialog({ open, handleClose, row }) {
 
     if (response.ok) {
       console.log(sid,'记录删除成功');
+      fetchData();
       handleClose();
       window.alert(responseData.message);
     } else {
@@ -371,6 +372,7 @@ export default function CustomerService() {
   const [productOptions, setProductOptions] = React.useState([]);
   const [futureRecords, setFutureRecords] = React.useState([]);
   const [historyRecords, setHistoryRecords] = React.useState([]);
+  const [customerData, setCustomerData] = React.useState([]);
 
   const handleOpenAddDialog = () => {
     setOpenAddDialog(true);
@@ -426,6 +428,15 @@ export default function CustomerService() {
       const data2 = await response2.json();
       const products = data2.products;
       setProductOptions(products);
+
+      const response3 = await fetch('http://127.0.0.1:5000/customerService/queryCustomers');
+      if (!response.ok) {
+        throw new Error('无法获取用户数据');
+      }
+      const data3 = await response3.json();
+      const customers = data3.customers
+      setCustomerData(customers);
+      // console.log(customerData);
     } catch (error) {
       console.error('用户数据获取失败:', error);
     }
@@ -439,7 +450,7 @@ export default function CustomerService() {
         <Stack direction="row" sx={{ mb: 2, flexGrow: 1 }}>
           <Typography variant='h6' sx={{ flexGrow: 1 }}>待办事项</Typography>
           <Button variant="contained" onClick={handleOpenAddDialog}>添加记录</Button>
-          <AddDialog open={openAddDialog} handleClose={handleCloseAddDialog} />
+          <AddDialog open={openAddDialog} handleClose={handleCloseAddDialog} fetchData={fetchData} products={productOptions} customers={customerData}/>
         </Stack>
         <TableContainer sx={{ maxHeight: 250 }} component={Paper}>
           <Table stickyHeader>
@@ -461,13 +472,13 @@ export default function CustomerService() {
                   <TableCell align="right">
                       <Box>
                         <Button variant="text" onClick={() => handleOpenConfirmDialog(row)}>删除</Button>
-                        <ConfirmDialog open={openConfirmDialog} handleClose={handleCloseConfirmDialog} row={selectedRecord}/>
+                        <ConfirmDialog open={openConfirmDialog} handleClose={handleCloseConfirmDialog} row={selectedRecord} fetchData={fetchData}/>
                       </Box>
                   </TableCell>
                   <TableCell align="right">
                       <Box>
                         <Button variant="text" onClick={() => handleOpenEditDialog(row)}>修改</Button>
-                        <EditDialog open={openEditDialog} handleClose={handleCloseEditDialog} row={selectedRecord} fetchData={fetchData} products={productOptions} />
+                        <EditDialog open={openEditDialog} handleClose={handleCloseEditDialog} row={selectedRecord} fetchData={fetchData} products={productOptions} customers={customerData} isRequired={false}/>
                       </Box>
                   </TableCell>
                 </TableRow>
@@ -500,13 +511,13 @@ export default function CustomerService() {
                   <TableCell align="right">
                       <Box>
                         <Button variant="text" onClick={() => handleOpenConfirmDialog(row)}>删除</Button>
-                        <ConfirmDialog open={openConfirmDialog} handleClose={handleCloseConfirmDialog} row={selectedRecord}/>
+                        <ConfirmDialog open={openConfirmDialog} handleClose={handleCloseConfirmDialog} row={selectedRecord} fetchData={fetchData}/>
                       </Box>
                   </TableCell>
                   <TableCell align="right">
                       <Box>
                         <Button variant="text" onClick={() => handleOpenEditDialog(row)}>修改</Button>
-                        <EditDialog open={openEditDialog} handleClose={handleCloseEditDialog} row={selectedRecord} fetchData={fetchData} products={productOptions} />
+                        <EditDialog open={openEditDialog} handleClose={handleCloseEditDialog} row={selectedRecord} fetchData={fetchData} products={productOptions} customers={customerData} isRequired={true} />
                       </Box>
                   </TableCell>
                 </TableRow>

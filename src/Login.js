@@ -25,6 +25,7 @@ export default function Login() {
           console.log('登录成功');
           localStorage.setItem("token", responseData.token);
           localStorage.setItem("userPermission", responseData.userPermission);
+          localStorage.setItem("name", responseData.name);
           console.log('登录界面-userPermission：', localStorage.getItem("userPermission"));
           navigate('/home'); // 跳转到系统首页
           window.alert(responseData.message);
