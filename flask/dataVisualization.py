@@ -13,14 +13,31 @@ def getChartData():
     date = datetime.strptime(date, '%Y-%m-%d')
     records = Activation.query.filter(Activation.start_date <= date, Activation.end_date >= date).all()
     pid_counter = Counter(record.pid for record in records)
-    result1 = []
+    result1 = [
+        {'name': '报税', 'value': 0},
+        {'name': '发票', 'value': 0},
+        {'name': '算薪', 'value': 0},
+        {'name': '咨询', 'value': 0}
+    ]
+    result3 = {'报税': [], '发票': [], '算薪': [], '咨询': []}
     for pid, count in pid_counter.items():
         product = Product.query.filter_by(id=pid).first()
         record_data = {
             'name': product.name,
             'value': count
         }
-        result1.append(record_data)
+        if product.category == '报税':
+            result3['报税'].append(record_data)
+            result1[0]['value'] += count
+        elif product.category == '发票':
+            result3['发票'].append(record_data)
+            result1[1]['value'] += count
+        elif product.category == '算薪':
+            result3['算薪'].append(record_data)
+            result1[2]['value'] += count
+        else:  # 咨询
+            result3['咨询'].append(record_data)
+            result1[3]['value'] += count
 
     range_param = int(request.args.get('range'))
     pid = int(request.args.get('pid'))
@@ -45,7 +62,7 @@ def getChartData():
         current_date += timedelta(days=1)
     # print(result1)
     # print(result2)
-    return jsonify({'result1': result1, 'result2': result2}), 200
+    return jsonify({'result1': result1, 'result2': result2, 'result3': result3}), 200
 
 @bp.route('/dataVisualization/getProductOptions', methods=['GET'])
 def getProductOptions():

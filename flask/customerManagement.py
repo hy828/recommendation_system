@@ -22,6 +22,12 @@ def queryAllCustomers():
     # print(customers_list)
     return jsonify({'customers': customers_list}), 200
 
+def getCondition(sql):
+    key, value = sql.split('=')
+    if '!' in key: cond = not_(getattr(Customer, key.replace('!', '')).like(f'%{value.strip("'")}%'))
+    else: cond = getattr(Customer, key).like(f'%{value.strip("'")}%')
+    return cond
+
 @bp.route('/customerManagement/advancedSearch', methods=['GET'])
 def advancedSearch():
     query = request.args.get('query')
@@ -31,26 +37,26 @@ def advancedSearch():
     second_and_index = query.rfind('&')
 
     arr = [item for i in query.split('|') for item in i.split('&')]
-    
-    key, value = arr[0].split('=')
-    if '!' in key: sql = Customer.query.filter(not_(getattr(Customer, key.replace('!', '')).like(f'%{value.strip("'")}%')))
-    else: sql = Customer.query.filter(getattr(Customer, key).like(f'%{value.strip("'")}%'))
-    if len(arr) > 1:
-        key, value = arr[1].split('=')
-        if '!' in key: condition = not_(getattr(Customer, key.replace('!', '')).like(f'%{value.strip("'")}%'))
-        else: condition = getattr(Customer, key).like(f'%{value.strip("'")}%')
-        if or_index == -1 or (or_index > and_index and and_index != -1):
-            sql = sql.filter(and_(condition))
-        else:
-            sql = sql.filter(or_(condition))
-    if len(arr) > 2:
-        key, value = arr[2].split('=')
-        if '!' in key: condition = not_(getattr(Customer, key.replace('!', '')).like(f'%{value.strip("'")}%'))
-        else: condition = getattr(Customer, key).like(f'%{value.strip("'")}%')
-        if second_or_index == -1 or second_or_index < second_and_index:
-            sql = sql.filter(and_(condition))
-        else:
-            sql = sql.filter(or_(condition))
+    conditions = []
+
+    for i in arr:
+        conditions.append(getCondition(i))
+
+    if len(arr) == 1:
+        sql = conditions[0]
+        sql = Customer.query.filter(sql)
+    elif len(arr) == 2:
+        if or_index == -1: sql = and_(*conditions)
+        else: sql = or_(*conditions)
+        sql = Customer.query.filter(sql)
+    elif len(arr) == 3:
+        if or_index == -1 or second_or_index == -1: sql = and_(*conditions)
+        elif and_index == -1 or second_and_index == -1: sql = or_(*conditions)
+        elif or_index < and_index: sql = and_(or_(conditions[0], conditions[1]), conditions[2])
+        else: sql = or_(and_(conditions[0], conditions[1]), conditions[2])
+        sql = Customer.query.filter(sql)
+    else: sql = Customer.query
+
     customers = sql.all()
     customers_list = []
     for customer in customers:

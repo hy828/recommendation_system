@@ -3,22 +3,21 @@ import { Box, CssBaseline, Paper, Grid, Select, MenuItem, TextField, Button, Tab
 import { useNavigate } from 'react-router-dom';
 import NavigationBar from './NavigationBar';
 
-function SearchInputRow({ num, searchTypes, bindTypes }) {
+function SearchInputRow({ num, searchTypes, bindTypes, searchTypeValue, searchValue, bindTypeValue, onSearchTypeChange, onSearchValueChange, onBindTypeChange }) {
   const searchTypeName = `searchType${num}`;
   const searchValueName = `searchValue${num}`;
   const bindTypeName = `bindType${num}`;
-  
+
   return (
     <Grid container columnSpacing={5}>
       <Grid item xs={3}>
         <Select
           fullWidth
           name={searchTypeName}
-          // labelId="searchType2"
-          // id="searchType2"
           hiddenLabel
           size='small'
-          defaultValue={'id'}
+          value={searchTypeValue}
+          onChange={(event) => onSearchTypeChange(event.target.value)}
         >
           {searchTypes.map((type) => (
             <MenuItem key={type.key} value={type.key}>{type.value}</MenuItem>
@@ -29,13 +28,14 @@ function SearchInputRow({ num, searchTypes, bindTypes }) {
         <TextField
           fullWidth
           name={searchValueName}
-          // id="outlined-basic"
           hiddenLabel
           size="small"
           variant="outlined"
           inputProps={{
             autoComplete: 'off',
           }}
+          value={searchValue}
+          onChange={(event) => onSearchValueChange(event.target.value)}
         />
       </Grid>
       { num === 1 ? <Grid item xs={3} /> : (
@@ -43,11 +43,10 @@ function SearchInputRow({ num, searchTypes, bindTypes }) {
           <Select
             fullWidth
             name={bindTypeName}
-            // labelId="bindType1"
-            // id="bindType1"
             hiddenLabel
             size='small'
-            defaultValue={'|'}
+            value={bindTypeValue}
+            onChange={(event) => onBindTypeChange(event.target.value)}
           >
             {bindTypes.map((type) => (
               <MenuItem key={type.key} value={type.key}>{type.value}</MenuItem>
@@ -101,7 +100,12 @@ function CustomerManagement({ rows }) {
 
 export default function Search() {
   const [rows, setRows] = React.useState([]);
-
+  const [searchInputs, setSearchInputs] = React.useState([
+    { searchTypeValue: 'id', searchValue: '', bindTypeValue: '|' },
+    { searchTypeValue: 'id', searchValue: '', bindTypeValue: '|' },
+    { searchTypeValue: 'id', searchValue: '', bindTypeValue: '|' },
+  ]);
+  
   const searchTypes = [
     {
       key: 'id',
@@ -219,22 +223,48 @@ export default function Search() {
     }
   };
 
+  const handleSearchInputChange = (num, field, value) => {
+    setSearchInputs(inputs =>
+      inputs.map((input, index) =>
+        index === num - 1 ? { ...input, [field]: value } : input
+      )
+    );
+  };
+
+  const handleClearSearch = () => {
+    setSearchInputs(inputs =>
+      inputs.map(() => ({
+        searchTypeValue: 'id',
+        searchValue: '',
+        bindTypeValue: '|',
+      }))
+    );
+    fetchData();
+  };
+
   return (
     <Box>
       <CssBaseline />
       <NavigationBar />
       <Box sx={{ mx: 10, pt: 12 }}>
         <Paper sx={{ px:5, pt:1, height: 250 }} component='form' onSubmit={handleSearch}>
-            <Box sx={{ my: 2 }}>
-              <SearchInputRow num={1} searchTypes={searchTypes} bindTypes={bindTypes}/>
+          {searchInputs.map((input, index) => (
+            <Box key={index} sx={{ my: 2 }}>
+              <SearchInputRow
+                num={index + 1}
+                searchTypes={searchTypes}
+                bindTypes={bindTypes}
+                searchTypeValue={input.searchTypeValue}
+                searchValue={input.searchValue}
+                bindTypeValue={input.bindTypeValue}
+                onSearchTypeChange={(value) => handleSearchInputChange(index + 1, 'searchTypeValue', value)}
+                onSearchValueChange={(value) => handleSearchInputChange(index + 1, 'searchValue', value)}
+                onBindTypeChange={(value) => handleSearchInputChange(index + 1, 'bindTypeValue', value)}
+              />
             </Box>
-            <Box sx={{ my: 2 }}>
-              <SearchInputRow num={2} searchTypes={searchTypes} bindTypes={bindTypes}/>
-            </Box>
-            <Box sx={{ my: 2 }}>
-              <SearchInputRow num={3} searchTypes={searchTypes} bindTypes={bindTypes}/>
-            </Box>
+          ))}
             <Box fullWidth sx={{ display: "flex", justifyContent: 'flex-end' }}>
+              <Button variant="contained" onClick={handleClearSearch} sx={{ mr: 3 }}>重置</Button>
               <Button variant="contained" type="submit">搜索</Button>
             </Box>
         </Paper>

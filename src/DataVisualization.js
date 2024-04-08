@@ -1,12 +1,15 @@
 import * as React from 'react';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import ReactEcharts from "echarts-for-react";
-import { LocalizationProvider } from '@mui/x-date-pickers'
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
-import { Container, Stack, FormControl, InputLabel, Select, MenuItem, TextField, Paper, Autocomplete } from '@mui/material';
+import { MenuItem, TextField, Paper, Grid, Divider } from '@mui/material';
 
-export default function DataVisualization({ barChartOption, lineChartOption, productOptions, fetchData }) {
-  const [selectedDate, setSelectedDate] = React.useState(null);
+export default function DataVisualization({ barChartOption, lineChartOption, pieChart1Option, pieChart2Option, pieChart3Option, pieChart4Option, productOptions, fetchData }) {
+  const today = new Date();
+  const formattedDate = today.toISOString().split('T')[0];
+  const [date, setDate] = React.useState(formattedDate);
+  const [range, setRange] = React.useState(7);
+  const [pid, setPid] = React.useState(1);
+  const [productName, setProductName] = React.useState('漏报漏缴提醒');
+
   const rangeOptions = [
     {
       key: '近7天',
@@ -22,90 +25,90 @@ export default function DataVisualization({ barChartOption, lineChartOption, pro
     }
   ];
   
+  React.useEffect(() => {
+    fetchData(date, range, pid, productName);
+  }, [date, range, pid, productName]);
 
-  const handleDateChange = (date) => {
-    setSelectedDate(date);
+  const handleDateChange = (event) => {
+    const selectedValue = event.target.value;
+    setDate(selectedValue);
   };
 
   const handleRangeChange = (event) => {
     const selectedValue = event.target.value;
-    console.log('当前选择的范围:', selectedValue);
-    fetchData(selectedValue, 1);
+    setRange(selectedValue);
   };
 
   const handleProductChange = (event) => {
     const selectedValue = event.target.value;
-    console.log('当前选择的范围:', selectedValue);
-    fetchData(7, selectedValue);
+    const product = productOptions.find(option => option.id === selectedValue);
+    setPid(selectedValue);
+    setProductName(product.label);
   };
 
   return (
-    <Container component={Paper} sx={{ p: 5 }}>
-      <Stack fullWidth direction="row" sx={{ mb:5 }}>
-        <Container sx={{ width: 1/2 }}>
-          {/* <LocalizationProvider dateAdapter={AdapterDayjs} >
-            <DatePicker />
-          </LocalizationProvider> */}
-        </Container>
-        <Stack fullWidth direction="row" sx={{ width: 1/2 }}>
-          <Container sx={{ width: 0.3 }}>
-            <FormControl sx={{ width: "100%" }}>
-              <InputLabel id="dateRange">范围</InputLabel>
-              <Select
-                labelId="dateRange"
-                id="dateRange"
-                // value={age}
-                label="range"
-                onChange={handleRangeChange}
-                defaultValue={7}
-              >
-                {rangeOptions.map((range) => (
-                  <MenuItem value={range.value}>{range.key}</MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Container>
-          <Container sx={{ width: 0.7 }}>
-            <FormControl sx={{ width: "90%" }}>
-              <Autocomplete
-                disablePortal
-                fullWidth
-                id="product"
-                name="product"
-                ListboxProps={{ style: { maxHeight: 250 } }}
-                options={productOptions}
-                defaultValue={1}
-                onChange={handleProductChange}
-                renderInput={(params) => 
-                <TextField {...params} 
-                  required
-                  margin="dense"
-                  label="产品"/>}
-              />
-              {/* <InputLabel id="product">产品</InputLabel>
-              <Select
-                labelId="product"
-                id="product"
-                // value={age}
-                label="pid"
-                onChange={handleProductChange}
-                defaultValue={1}
-              >
-                {productOptions ? 
-                  (productOptions.map((productOption) => (
-                    <MenuItem value={productOption.id}>{productOption.label}</MenuItem>
-                  )))
-                : "Not loaded yet"}
-              </Select> */}
-            </FormControl>
-          </Container>
-        </Stack>
-      </Stack>
-      <Stack fullWidth direction="row">
-        <ReactEcharts option={barChartOption} style={{ height: "400px", width: "50%" }}/>
-        <ReactEcharts option={lineChartOption} style={{ height: "400px", width: "50%" }}/>
-      </Stack>
-    </Container>
-      
+    <Paper sx={{ p: 3 }}>
+      <Grid container columnSpacing={5} rowSpacing={1}>
+        <Grid item xs={6}>
+          <TextField
+            fullWidth
+            size='small'
+            margin="dense"
+            label="日期" 
+            type="date"
+            onChange={handleDateChange}
+            defaultValue={formattedDate}
+          />
+        </Grid>
+        <Grid item xs={2}>
+          <TextField
+            fullWidth
+            size='small'
+            select
+            margin="dense"
+            label="范围" 
+            onChange={handleRangeChange}
+            defaultValue={7}
+          >
+            {rangeOptions.map((range) => (
+              <MenuItem value={range.value}>{range.key}</MenuItem>
+            ))}
+          </TextField>
+        </Grid>
+        <Grid item xs={4}>
+          <TextField
+            fullWidth
+            size='small'
+            select
+            margin="dense"
+            label="产品" 
+            onChange={handleProductChange}
+            defaultValue={1}
+          >
+            {productOptions.map((productOption) => (
+              <MenuItem value={productOption.id}>{productOption.label}</MenuItem>
+            ))}
+          </TextField>
+        </Grid>
+        <Grid item xs={6} sx={{ pb: 3 }}>
+          <ReactEcharts option={barChartOption} style={{ height: "300px" }}/>
+        </Grid>
+        <Grid item xs={6} sx={{ pb: 3 }}>
+        <ReactEcharts option={lineChartOption} style={{ height: "300px"}}/>
+        </Grid>
+        <Grid item xs={3}>
+        <ReactEcharts option={pieChart1Option} style={{ height: "200px", padding: 0}}/>
+        </Grid>
+        <Grid item xs={3}>
+        <ReactEcharts option={pieChart2Option} style={{ height: "200px"}}/>
+        </Grid>
+        <Grid item xs={3}>
+        <ReactEcharts option={pieChart3Option} style={{ height: "200px"}}/>
+        </Grid>
+        <Grid item xs={3}>
+        <ReactEcharts option={pieChart4Option} style={{ height: "200px"}}/>
+        </Grid>
+      </Grid>
+    </Paper>
   );
 }
