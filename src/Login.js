@@ -1,10 +1,19 @@
 import * as React from 'react';
-import { Avatar, Button, CssBaseline, TextField, Box, Typography, Container } from '@mui/material';
+import { Avatar, Button, CssBaseline, TextField, Box, Typography, Container, Snackbar, Alert } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { useNavigate } from 'react-router-dom';
 
 export default function Login() {
   const navigate = useNavigate();
+  const [open, setOpen] = React.useState(false);
+
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setOpen(false);
+  };
 
   // 处理登录请求给后端，提交用户名和密码
   const handleSubmit = async (event) => {
@@ -23,6 +32,7 @@ export default function Login() {
 
       if (response.ok) {
           console.log('登录成功');
+          // setOpen(true);
           localStorage.setItem("token", responseData.token);
           localStorage.setItem("userPermission", responseData.userPermission);
           localStorage.setItem("name", responseData.name);
@@ -90,6 +100,16 @@ export default function Login() {
               登录
             </Button>
           </Box>
+          <Snackbar open={open} autoHideDuration={2000} onClose={handleClose}>
+            <Alert
+              onClose={handleClose}
+              severity="success"
+              variant="filled"
+              sx={{ width: '100%' }}
+            >
+              登录成功！
+            </Alert>
+          </Snackbar>
         </Box>
       </Container>
     </Box>

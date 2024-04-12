@@ -1,7 +1,8 @@
 import * as React from 'react';
-import { Box, CssBaseline, Paper, Grid, Select, MenuItem, TextField, Button, TableCell, TableRow, TableHead, TableBody, Table, TableContainer } from '@mui/material';
+import { Box, CssBaseline, Paper, Grid, Select, MenuItem, TextField, Button, TableCell, TableRow, TableHead, TableBody, Table, TableContainer, TableSortLabel } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import NavigationBar from './NavigationBar';
+import { visuallyHidden } from '@mui/utils';
 
 function SearchInputRow({ num, searchTypes, bindTypes, searchTypeValue, searchValue, bindTypeValue, onSearchTypeChange, onSearchValueChange, onBindTypeChange }) {
   const searchTypeName = `searchType${num}`;
@@ -58,8 +59,81 @@ function SearchInputRow({ num, searchTypes, bindTypes, searchTypeValue, searchVa
   );
 }
 
+function stableSort(array, comparator) {
+  const stabilizedThis = array.map((el, index) => [el, index]);
+  stabilizedThis.sort((a, b) => {
+    const order = comparator(a[0], b[0]);
+    if (order !== 0) {
+      return order;
+    }
+    return a[1] - b[1];
+  });
+  return stabilizedThis.map((el) => el[0]);
+}
+
 function CustomerManagement({ rows }) {
   const navigate = useNavigate();
+  const [order, setOrder] = React.useState('asc');
+  const [orderBy, setOrderBy] = React.useState('id');
+
+  const headCells = [
+    {
+      id: 'id',
+      label: 'ID',
+    },
+    {
+      id: 'name',
+      label: '名称',
+    },
+    {
+      id: 'khlx',
+      label: '客户类型',
+    },
+    {
+      id: 'qygmmc',
+      label: '企业规模名称',
+    },
+    {
+      id: 'scale',
+      label: '企业规模',
+    },
+    {
+      id: 'industry_top',
+      label: '行业门类',
+    },
+  ];
+
+  const onRequestSort = (event, property) => {
+    const isAsc = orderBy === property && order === 'asc';
+    setOrder(isAsc ? 'desc' : 'asc');
+    setOrderBy(property);
+  };
+
+  const createSortHandler = (property) => (event) => {
+    onRequestSort(event, property);
+  };
+
+  function descendingComparator(a, b, orderBy) {
+    if (b[orderBy] < a[orderBy]) {
+      return -1;
+    }
+    if (b[orderBy] > a[orderBy]) {
+      return 1;
+    }
+    return 0;
+  }
+
+  function getComparator(order, orderBy) {
+    return order === 'desc'
+      ? (a, b) => descendingComparator(a, b, orderBy)
+      : (a, b) => -descendingComparator(a, b, orderBy);
+  }
+
+  const visibleRows = React.useMemo(
+    () =>
+      stableSort(rows, getComparator(order, orderBy)),
+    [order, orderBy, rows],
+  );
 
   return (
     <Box sx={{ mt: 3 }}>
@@ -68,17 +142,28 @@ function CustomerManagement({ rows }) {
         <Table stickyHeader>
           <TableHead>
             <TableRow>
-              <TableCell>ID</TableCell>
-              <TableCell sx={{ flexGrow: 1 }}>名称</TableCell>
-              <TableCell>客户类型</TableCell>
-              <TableCell>企业规模名称</TableCell>
-              <TableCell>企业规模</TableCell>
-              <TableCell>行业门类</TableCell>
+              {headCells.map((headCell) => (
+                <TableCell>
+                  <TableSortLabel
+                    active={orderBy === headCell.id}
+                    direction={orderBy === headCell.id ? order : 'asc'}
+                    onClick={createSortHandler(headCell.id)}
+                  >
+                    {headCell.label}
+                    {orderBy === headCell.id ? (
+                      <Box component="span" sx={visuallyHidden}>
+                        {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                      </Box>
+                    ) : null}
+                  </TableSortLabel>
+                </TableCell>
+              ))}
               <TableCell align="right"></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map((row) => (
+            {visibleRows.map((row) => (
+            // {rows.map((row) => (
               <TableRow key={row.id}>
                 <TableCell>{row.id}</TableCell>
                 <TableCell sx={{ flexGrow: 1 }}>{row.name}</TableCell>

@@ -1,8 +1,9 @@
 import * as React from 'react';
 import { styled, alpha } from '@mui/material/styles';
 import SearchIcon from '@mui/icons-material/Search';
-import { Box, CssBaseline, InputBase, Table, TableBody, TableCell, TableHead, TableRow, Dialog, DialogActions, DialogContent, DialogTitle, Button, TextField, Stack, Radio, FormControlLabel, RadioGroup, Paper, TableContainer } from '@mui/material';
+import { Box, CssBaseline, InputBase, Table, TableBody, TableCell, TableHead, TableRow, Dialog, DialogActions, DialogContent, DialogTitle, Button, TextField, Stack, Radio, FormControlLabel, RadioGroup, Paper, TableContainer, TableSortLabel } from '@mui/material';
 import NavigationBar from './NavigationBar';
+import { visuallyHidden } from '@mui/utils';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -45,6 +46,18 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     },
   },
 }));
+
+function stableSort(array, comparator) {
+  const stabilizedThis = array.map((el, index) => [el, index]);
+  stabilizedThis.sort((a, b) => {
+    const order = comparator(a[0], b[0]);
+    if (order !== 0) {
+      return order;
+    }
+    return a[1] - b[1];
+  });
+  return stabilizedThis.map((el) => el[0]);
+}
 
 function EditDialog({ open, handleClose, permission, username, fetchData }) {
   let dialogContent;
@@ -202,6 +215,63 @@ export default function UserManagement() {
   const [selectedUsername, setSelectedUsername] = React.useState(null);
   const [searchQuery, setSearchQuery] = React.useState('');
   const userPermission = localStorage.getItem("userPermission");
+  const [order, setOrder] = React.useState('asc');
+  const [orderBy, setOrderBy] = React.useState('id');
+
+  const headCells = [
+    {
+      id: 'username',
+      label: 'ID',
+    },
+    {
+      id: 'name',
+      label: '名字',
+    },
+    {
+      id: 'phone_number',
+      label: '联系方式',
+    },
+    {
+      id: 'email',
+      label: '电子邮件',
+    },
+    {
+      id: 'permission',
+      label: '权限级别',
+    },
+  ];
+
+  const onRequestSort = (event, property) => {
+    const isAsc = orderBy === property && order === 'asc';
+    setOrder(isAsc ? 'desc' : 'asc');
+    setOrderBy(property);
+  };
+
+  const createSortHandler = (property) => (event) => {
+    onRequestSort(event, property);
+  };
+
+  function descendingComparator(a, b, orderBy) {
+    if (b[orderBy] < a[orderBy]) {
+      return -1;
+    }
+    if (b[orderBy] > a[orderBy]) {
+      return 1;
+    }
+    return 0;
+  }
+
+  function getComparator(order, orderBy) {
+    return order === 'desc'
+      ? (a, b) => descendingComparator(a, b, orderBy)
+      : (a, b) => -descendingComparator(a, b, orderBy);
+  }
+
+  const visibleRows = React.useMemo(
+    () =>
+      stableSort(rows, getComparator(order, orderBy)),
+    [order, orderBy, rows],
+  );
 
   // 根据搜索框改变的内容实时更新表格
   const handleInputChange = async (event) => {
@@ -280,15 +350,10 @@ export default function UserManagement() {
         </Stack>
         <TableContainer sx={{ maxHeight: 500 }} component={Paper}>
           <Table stickyHeader>
-            {/* <TableHead>
+            <TableHead>
               <TableRow>
                 {headCells.map((headCell) => (
-                  <TableCell
-                    key={headCell.id}
-                    align={headCell.numeric ? 'right' : 'left'}
-                    padding={headCell.disablePadding ? 'none' : 'normal'}
-                    sortDirection={orderBy === headCell.id ? order : false}
-                  >
+                  <TableCell>
                     <TableSortLabel
                       active={orderBy === headCell.id}
                       direction={orderBy === headCell.id ? order : 'asc'}
@@ -303,20 +368,11 @@ export default function UserManagement() {
                     </TableSortLabel>
                   </TableCell>
                 ))}
-              </TableRow>
-            </TableHead> */}
-            <TableHead>
-              <TableRow>
-                <TableCell>ID</TableCell>
-                <TableCell>名字</TableCell>
-                <TableCell>联系方式</TableCell>
-                <TableCell>电子邮件</TableCell>
-                <TableCell>权限级别</TableCell>
                 <TableCell align="right"></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {rows.map((row) => (
+              {visibleRows.map((row) => (
                 <TableRow key={row.username}>
                   <TableCell>{row.username}</TableCell>
                   <TableCell>{row.name}</TableCell>
