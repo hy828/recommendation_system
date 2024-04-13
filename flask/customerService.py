@@ -14,30 +14,43 @@ def queryAllRecords():
     id = token_decode["user_id"]
     date = datetime.now().date()
     records = Service.query.filter(Service.uid == id).all()
-    future_list = []
-    history_list = []
+    record_list = []
     for record in records:
         customer = Customer.query.filter_by(id=record.cid).first()
-        user = User.query.filter_by(id=record.uid).first()
         product = Product.query.filter_by(id=record.pid).first()
         if record.result == 0: result = "无意向"
         elif record.result == 1: result = "已购买"
         elif record.result == 2: result = "有意向"
-        else: result = None
+        else: 
+            if record.date < date: result = "待补充"
+            else: result = "无"
         record_data = {
             'sid': record.sid,
             'date': str(record.date),
-            'cid': customer.id,
             'customerName': customer.name,
-            'pid': record.pid,
             'product': product.name,
-            'content': record.content,
             'result': result,
         }
-        if record.date < date: history_list.append(record_data)
-        else: future_list.append(record_data)
-    # print(future_list)
-    return jsonify({'future': future_list, 'history': history_list}), 200
+        record_list.append(record_data)
+    return jsonify({'records': record_list}), 200
+
+@bp.route('/customerService/queryRecord', methods=['GET'])
+def queryRecord():
+    sid = int(request.args.get('query'))
+    record = Service.query.filter(Service.sid == sid).first()
+    customer = Customer.query.filter_by(id=record.cid).first()
+    product = Product.query.filter_by(id=record.pid).first()
+    record_data = {
+        'sid': record.sid,
+        'date': str(record.date),
+        'cid': customer.id,
+        'customerName': customer.name,
+        'pid': record.pid,
+        'product': product.name,
+        'content': record.content,
+        'result': record.result,
+    }
+    return jsonify({'record': record_data}), 200
 
 @bp.route('/customerService/updateRecord', methods=['POST'])
 def updateRecord():
@@ -46,12 +59,11 @@ def updateRecord():
     record = Service.query.filter_by(sid=sid).first()
     record.date = data.get('date')
     record.cid = data.get('cid')
-    record.uid = data.get('uid')
     record.pid = data.get('pid')
     record.content = data.get('content')
     record.result = data.get('result')
     db.session.commit()
-    return jsonify({'message': '用户权限已更新'}), 200
+    return jsonify({'message': '记录已更新'}), 200
 
 @bp.route('/customerService/queryCustomers', methods=['GET'])
 def queryCustomers():
