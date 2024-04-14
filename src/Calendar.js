@@ -524,13 +524,13 @@ export default function Notification() {
     <Box>
       <CssBaseline />
       <NavigationBar />
-      <Box sx={{ m: 10 }}>
+      <Box sx={{ ml: 30, my: 3, mr: 5 }}>
         <Paper
           sx={{
             p: 2,
             display: 'flex',
             flexDirection: 'column',
-            height: 630,
+            height: 680,
           }}>
           <FullCalendar
             plugins={[dayGridPlugin, interactionPlugin, listPlugin]}

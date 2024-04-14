@@ -8,6 +8,8 @@ class User(db.Model):
     permission = db.Column(db.Integer, nullable=False)
     phone_no = db.Column(db.String(20), nullable=False)
     email = db.Column(db.String(20), nullable=False)
+    gender = db.Column(db.Integer, nullable=False)
+    wechatid = db.Column(db.String(20), nullable=False)
 
 class Product(db.Model):
     __tablename__ = "product"

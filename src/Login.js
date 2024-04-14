@@ -38,7 +38,7 @@ export default function Login() {
           localStorage.setItem("name", responseData.name);
           console.log('登录界面-userPermission：', localStorage.getItem("userPermission"));
           navigate('/home'); // 跳转到系统首页
-          window.alert(responseData.message);
+          // window.alert(responseData.message);
       } else {
           console.log('登录失败');
           window.alert(responseData.message);
@@ -57,16 +57,26 @@ export default function Login() {
             alignItems: 'center',
           }}
         >
-          <Typography component="h1" variant="h3" sx={{ m:3 }}>
+          <Typography component="h5" variant="h4"
+            sx={{ 
+              my: 5, 
+              display: { xs: 'none', md: 'flex' }, 
+              fontFamily: 'monospace',
+              fontWeight: 700, 
+              letterSpacing: '.3rem', 
+              color: 'inherit',
+              textDecoration: 'none',
+          }}
+          >
             辅助营销推荐系统平台
           </Typography>
-          <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
+          {/* <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
             <LockOutlinedIcon />
-          </Avatar>
-          <Typography component="h3" variant="h5">
+          </Avatar> */}
+          <Typography component="h5" variant="h5">
             登录
           </Typography>
-          <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+          <Box component="form" onSubmit={handleSubmit} noValidate sx={{ my: 3 }}>
             <TextField
               margin="normal"
               required
@@ -95,7 +105,7 @@ export default function Login() {
               type="submit"
               fullWidth
               variant="contained"
-              sx={{ mt: 3, mb: 2 }}
+              sx={{ mt: 5, mb: 2 }}
             >
               登录
             </Button>

@@ -8,19 +8,22 @@ import PersonalCenter from './PersonalCenter'
 import Notification from './Notification'
 import Calendar from './Calendar'
 import { Routes, Route, Navigate } from 'react-router-dom'
-import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { createTheme, ThemeProvider, getContrastRatio } from '@mui/material/styles';
 
 const defaultTheme = createTheme({
   palette: {
     mode: 'light',
-    primary: {
-      main: '#3949ab',
-    },
-    secondary: {
-      main: '#b2dfdb',
-    },
+    // primary: {
+    //   main: '#3949ab',
+    //   contrastText: getContrastRatio('#3949ab', '#fff') > 4.5 ? '#fff' : '#111',
+    // },
+    // secondary: {
+    //   main: '#b2dfdb',
+    //   contrastText: getContrastRatio('#b2dfdb', '#fff') > 4.5 ? '#fff' : '#111',
+    // },
     background: {
       default: '#fafafa',
+      contrastText: getContrastRatio('#fafafa', '#fff') > 4.5 ? '#fff' : '#111',
     },
   },
 });

@@ -53,3 +53,35 @@ def changePassword():
     else:
         print('密码修改失败，原密码错误')
         return jsonify({'message': '原密码错误'}), 400
+
+@bp.route('/users/queryPersonalInformation', methods=['POST'])
+def queryPersonalInformation():
+    token = request.headers.get('Authorization')
+    token_decode = jwt.decode(token, jwt_secret_key, algorithms=['HS256'])
+    id = token_decode["user_id"]
+    user = User.query.filter_by(id=id).first()
+    record_data = {
+        'id': user.id,
+        'name': user.name,
+        'permission': user.permission,
+        'phone_no': user.phone_no,
+        'email': user.email,
+        'gender': user.gender,
+        'wechatid': user.wechatid,
+    }
+    return jsonify({'record': record_data}), 200
+
+@bp.route('/users/updateInformation', methods=['POST'])
+def updateInformation():
+    data = request.json
+    token = request.headers.get('Authorization')
+    token_decode = jwt.decode(token, jwt_secret_key, algorithms=['HS256'])
+    id = token_decode["user_id"]
+    user = User.query.filter_by(id=id).first()
+    user.name = data['name']
+    user.phone_no = data['phone_no']
+    user.email = data['email']
+    # user.gender
+    user.wechatid = data['wechatid']
+    db.session.commit()
+    return jsonify({'message': '更新成功'}), 200

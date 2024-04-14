@@ -1,21 +1,25 @@
 import * as React from 'react';
-import { Box, CssBaseline, Paper, Typography, Grid, Table, TableBody, TableCell, TableHead, TableRow, TableContainer } from '@mui/material';
+import { Box, CssBaseline, Paper, Typography, Grid, Table, TableBody, TableCell, TableHead, TableRow, TableContainer, Chip, Stack } from '@mui/material';
 import NavigationBar from './NavigationBar';
 import { useLocation } from 'react-router-dom';
 
 function Details({ customerDetails }) {
+  const basicInfo = ['注册资本', '成立天数', '行业门类', '从业人数', '企业规模', '企业规模名称', '客户类型', '客户数量', '供应商数量', '信用等级', '纳税人状态代码', '增值纳税人类型'];
   return (
-    <Grid container spacing={1}>
-      {customerDetails.map(([key, value]) => (
-        <Grid key={key} item xs={3}>
-          <Typography variant="body1">
-            <strong>{key}: </strong>{value}
-          </Typography>
-        </Grid>
-      ))}
+    <Grid container rowSpacing={3}>
+      {customerDetails.map(([key, value]) => {
+        if (basicInfo.includes(key)) {
+          return (
+            <Grid key={key} item xs={2} sx={{ flexDirection: 'row' }}>
+              <Typography variant="subtitle2" color='primary.main' fontWeight='700'>{key}</Typography>
+              <Typography variant="body1">{value}</Typography>
+            </Grid>
+          );
+        }
+        return null; // Render nothing if the key is not in basicInfo
+      })}
     </Grid>
   )
-  
 }
 
 export default function CustomerDetail() {
@@ -49,22 +53,44 @@ export default function CustomerDetail() {
     }
   };
 
+  const getChipColor = (membershipType) => {
+    switch (membershipType) {
+      case 'VIP':
+        return 'success';
+      case '非VIP':
+        return 'default';
+      case '过期VIP':
+        return 'error';
+    }
+  };
+
   return (
     <Box>
       <CssBaseline />
       <NavigationBar />
-      <Box sx={{ mx: 10, pt: 12 }}>
+      <Box sx={{ ml: 30, my: 3, mr: 5 }}>
         <Grid container spacing={3}>
           <Grid item xs={12} md={7} lg={8}>
             <Paper
               sx={{
-                p: 2,
+                p: 3,
                 display: 'flex',
                 flexDirection: 'column',
-                height: 270,
+                height: 330,
               }}
             >
+              <Typography variant="h5" sx={{ fontWeight: 600, mb: 3 }}>
+                {customerDetails['客户名称']}
+                <Chip label={customerDetails['会员类型']} variant="outlined" size='small' color={getChipColor(customerDetails['会员类型'])} sx={{ ml: 2 }}/>
+              </Typography>
               <Details customerDetails={Object.entries(customerDetails)}/>
+              {/* <Typography>客户类型：{customerDetails['客户类型']}</Typography>
+              <Typography>企业规模名称：{customerDetails['企业规模名称']}</Typography>
+              <Typography>企业规模：{customerDetails['企业规模']}</Typography>
+              <Typography>注册资本：{customerDetails['注册资本']}</Typography>
+              <Typography>从业人数：{customerDetails['从业人数']}</Typography>
+              <Typography>成立天数：{customerDetails['成立天数']}</Typography>
+              <Typography>行业门类：{customerDetails['行业门类']}</Typography> */}
             </Paper>
           </Grid>
           <Grid item xs={12} md={5} lg={4}>
@@ -73,10 +99,10 @@ export default function CustomerDetail() {
                 p: 2,
                 display: 'flex',
                 flexDirection: 'column',
-                height: 270,
+                height: 330,
               }}
             >
-              {/* <Deposits /> */}
+              <Typography>功能推荐</Typography>
             </Paper>
           </Grid>
           <Grid item xs={12}>
@@ -94,13 +120,13 @@ export default function CustomerDetail() {
               sx={{ 
                 display: 'flex', 
                 flexDirection: 'column',
-                height: 300, 
+                height: 320, 
               }} 
               component={Paper}
             >
               <Table stickyHeader>
                 <TableHead>
-                  <TableRow>
+                  <TableRow sx={{ "& th": { color: "white", backgroundColor: "secondary.main" } }}>
                     <TableCell>日期</TableCell>
                     <TableCell>负责人</TableCell>
                     <TableCell>产品功能</TableCell>

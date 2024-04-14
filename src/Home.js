@@ -261,7 +261,7 @@ export default function Home() {
     <Box>
       <CssBaseline />
       <NavigationBar />
-      <Box  sx={{ mx: 10, pt: 10 }}>
+      <Box  sx={{ ml: 30, my: 3, mr: 5 }}>
         <DataVisualization barChartOption={barChartOption} lineChartOption={lineChartOption} pieChart1Option={pieChart1Option} pieChart2Option={pieChart2Option} pieChart3Option={pieChart3Option} pieChart4Option={pieChart4Option} productOptions={productOptions} fetchData={fetchData}/>
       </Box>
     </Box>

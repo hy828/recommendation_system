@@ -330,7 +330,7 @@ export default function UserManagement() {
     <Box>
       <CssBaseline />
       <NavigationBar />
-      <Box  sx={{ mx: 10, pt: 15 }}>
+      <Box  sx={{ ml: 30, my: 5, mr: 5 }}>
         <Stack direction="row" sx={{ flexGrow: 1, mb: 5 }}>
           <Paper sx={{ flexGrow: 1, px: 5, py: 0.5, mr: 5 }}>
             <Search>
@@ -348,7 +348,7 @@ export default function UserManagement() {
           <Button variant="contained" onClick={handleOpenAddDialog}>添加用户</Button>
           <AddDialog open={openAddDialog} handleClose={handleCloseAddDialog} fetchData={fetchData} />
         </Stack>
-        <TableContainer sx={{ maxHeight: 500 }} component={Paper}>
+        <TableContainer sx={{ maxHeight: 560 }} component={Paper}>
           <Table stickyHeader>
             <TableHead>
               <TableRow>

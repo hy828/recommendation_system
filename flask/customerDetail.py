@@ -11,9 +11,10 @@ bp = Blueprint('customerDetail', __name__)
 def queryAllRecords():
     id = request.args.get('query')
     # 基本信息
-    details = Customer.query.filter(id == id).first()
+    details = Customer.query.filter(Customer.id == id).first()
     fields = [column.key for column in Customer.__table__.columns if column.key != 'id']
     customer_data = {}
+    customer_data['id'] = id
     for field in fields:
         # 获取字段解释
         description = Description.query.filter_by(id=field).first()
@@ -38,4 +39,5 @@ def queryAllRecords():
             'result': result,
         }
         records_list.append(record_data)
+    # print(customer_data)
     return jsonify({'details': customer_data, 'serviceRecords': records_list}), 200

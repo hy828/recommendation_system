@@ -138,10 +138,10 @@ function CustomerManagement({ rows }) {
   return (
     <Box sx={{ mt: 3 }}>
       <CssBaseline />
-      <TableContainer sx={{ maxHeight: 350 }} component={Paper}>
+      <TableContainer sx={{ maxHeight: 400 }} component={Paper}>
         <Table stickyHeader>
           <TableHead>
-            <TableRow>
+            <TableRow sx={{ "& th": { color: "white", backgroundColor: "secondary.main" } }}>
               {headCells.map((headCell) => (
                 <TableCell>
                   <TableSortLabel
@@ -331,7 +331,7 @@ export default function Search() {
     <Box>
       <CssBaseline />
       <NavigationBar />
-      <Box sx={{ mx: 10, pt: 12 }}>
+      <Box sx={{ ml: 30, my: 3, mr: 5 }}>
         <Paper sx={{ px:5, pt:1, height: 250 }} component='form' onSubmit={handleSearch}>
           {searchInputs.map((input, index) => (
             <Box key={index} sx={{ my: 2 }}>
