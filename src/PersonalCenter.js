@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { CssBaseline, Box, Paper, Typography, Dialog, DialogTitle, DialogContent, Stack, TextField, DialogActions, Button, List, ListItemButton, ListItemIcon, ListItemText, Divider, Tabs, Tab, Grid, Chip } from '@mui/material';
+import { CssBaseline, Box, Paper, Typography, Dialog, DialogTitle, DialogContent, Stack, TextField, DialogActions, Button, List, ListItemButton, ListItemIcon, ListItemText, Divider, Tabs, Tab, Grid, Chip, Radio, RadioGroup, FormControlLabel } from '@mui/material';
 import NavigationBar from './NavigationBar';
 import { LocalPhone, Email, Forum, Badge, Person } from '@mui/icons-material';
 
@@ -185,6 +185,20 @@ export default function PersonalCenter() {
                         isEdit ?
                         <TextField name='name' variant="outlined" size='small' required hiddenlabel fullWidth defaultValue={info.name} /> :
                         <Typography>{info.name}</Typography>
+                    }</Grid>
+                    <Grid item xs={1}>
+                      <Person />
+                    </Grid>
+                    <Grid item xs={2}>
+                      <Typography>性别</Typography>
+                    </Grid>
+                    <Grid item xs={9}>{ 
+                        isEdit ?
+                        (<RadioGroup row defaultValue={info.gender} name="gender">
+                          <FormControlLabel value="0" control={<Radio />} label="男" />
+                          <FormControlLabel value="1" control={<Radio />} label="女" />
+                        </RadioGroup>) :
+                        <Typography>{info.gender ? '男' : '女'}</Typography>
                     }</Grid>
                     <Grid item xs={1}>
                       <LocalPhone />

@@ -141,7 +141,7 @@ function CustomerManagement({ rows }) {
       <TableContainer sx={{ maxHeight: 400 }} component={Paper}>
         <Table stickyHeader>
           <TableHead>
-            <TableRow sx={{ "& th": { color: "white", backgroundColor: "secondary.main" } }}>
+            <TableRow>
               {headCells.map((headCell) => (
                 <TableCell>
                   <TableSortLabel

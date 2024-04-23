@@ -126,7 +126,7 @@ export default function CustomerDetail() {
             >
               <Table stickyHeader>
                 <TableHead>
-                  <TableRow sx={{ "& th": { color: "white", backgroundColor: "secondary.main" } }}>
+                  <TableRow>
                     <TableCell>日期</TableCell>
                     <TableCell>负责人</TableCell>
                     <TableCell>产品功能</TableCell>

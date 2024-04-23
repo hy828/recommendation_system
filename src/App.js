@@ -23,7 +23,6 @@ const defaultTheme = createTheme({
     // },
     background: {
       default: '#fafafa',
-      contrastText: getContrastRatio('#fafafa', '#fff') > 4.5 ? '#fff' : '#111',
     },
   },
 });

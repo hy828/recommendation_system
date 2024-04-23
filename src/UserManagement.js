@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { styled, alpha } from '@mui/material/styles';
 import SearchIcon from '@mui/icons-material/Search';
-import { Box, CssBaseline, InputBase, Table, TableBody, TableCell, TableHead, TableRow, Dialog, DialogActions, DialogContent, DialogTitle, Button, TextField, Stack, Radio, FormControlLabel, RadioGroup, Paper, TableContainer, TableSortLabel } from '@mui/material';
+import { Box, CssBaseline, InputBase, Table, TableBody, TableCell, TableHead, TableRow, Dialog, DialogActions, DialogContent, DialogTitle, Button, TextField, Stack, Radio, FormControlLabel, RadioGroup, Paper, TableContainer, TableSortLabel, Chip } from '@mui/material';
 import NavigationBar from './NavigationBar';
 import { visuallyHidden } from '@mui/utils';
 
@@ -378,7 +378,11 @@ export default function UserManagement() {
                   <TableCell>{row.name}</TableCell>
                   <TableCell>{row.phone_number}</TableCell>
                   <TableCell>{row.email}</TableCell>
-                  <TableCell>{row.permission === 0 ? '普通用户' : '高级用户'}</TableCell>
+                  <TableCell>{
+                    row.permission === 0 ? 
+                    <Chip label='普通用户' color='info' variant='outlined'/> : 
+                    <Chip label='高级用户' color='success' variant='outlined'/>
+                  }</TableCell>
                   <TableCell align="right">{ 
                     userPermission === '1' &&
                       <Button variant="text" onClick={() => handleOpenEditDialog(row.permission, row.username)}>修改权限</Button>
