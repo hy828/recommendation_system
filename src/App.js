@@ -13,14 +13,6 @@ import { createTheme, ThemeProvider, getContrastRatio } from '@mui/material/styl
 const defaultTheme = createTheme({
   palette: {
     mode: 'light',
-    // primary: {
-    //   main: '#3949ab',
-    //   contrastText: getContrastRatio('#3949ab', '#fff') > 4.5 ? '#fff' : '#111',
-    // },
-    // secondary: {
-    //   main: '#b2dfdb',
-    //   contrastText: getContrastRatio('#b2dfdb', '#fff') > 4.5 ? '#fff' : '#111',
-    // },
     background: {
       default: '#fafafa',
     },
@@ -34,7 +26,7 @@ export default function App() {
         <Route path="/" element={<Navigate to="/login" />} />
         <Route path="/login" element={<Login />} />
         <Route path="/home" element={<Home />} />
-        <Route path="/service" element={<Calendar />} />
+        <Route path="/follow" element={<Calendar />} />
         <Route path="/permission" element={<UserManagement />} />
         <Route path="/notification" element={<Notification />} />
         <Route path="/personal" element={<PersonalCenter />} />

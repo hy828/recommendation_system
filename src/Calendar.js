@@ -7,13 +7,23 @@ import { CssBaseline, Box, Paper, Button, TextField, Dialog, DialogActions, Dial
 import NavigationBar from './NavigationBar';
 
 function AddDialog({ open, handleClose, products, customers, fetchData, date }) {
-  const name = localStorage.getItem("name");
+  /*
+  * 添加记录框
+  * @param {boolean} open - 控制对话框的打开和关闭
+  * @param {function} handleClose - 关闭对话框的回调函数
+  * @param {array} products - 产品列表
+  * @param {array} customers - 客户列表
+  * @param {function} fetchData - 重新获取数据的回调函数
+  * @param {string} date - 日期
+  * @returns {JSX.Element}
+  */
+  const name = localStorage.getItem("name"); // 获取目前登录用户的用户名
 
   const [cid, setCid] = React.useState(null);
   const [pid, setPid] = React.useState(null);
   const [result, setResult] = React.useState(null);
 
-  const resultOptions = [
+  const resultOptions = [ // 结果选项
     {
       value: 0,
       label: '无意向',
@@ -36,31 +46,31 @@ function AddDialog({ open, handleClose, products, customers, fetchData, date }) 
     const date = formData.get('date');
     const content = formData.get('content');
 
-    // console.log(date, cid, pid, content, result);
-      const response = await fetch('http://127.0.0.1:5000/customerService/addRecord', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': localStorage.getItem("token")
-        },
-        body: JSON.stringify({
-          'date': date,
-          'cid': cid,
-          'pid': pid,
-          'content': content,
-          'result': result,
-        }),
-      });
-      const responseData = await response.json();
-      if (response.ok) {
-        console.log('记录添加成功');
-        fetchData();
-        handleClose();
-        window.alert(responseData.message);
-      } else {
-        console.log('记录添加失败');
-        window.alert(responseData.message);
-      }
+    // 向后端发送请求，添加记录
+    const response = await fetch('http://127.0.0.1:5000/follow_up_management/add_record', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': localStorage.getItem("token")
+      },
+      body: JSON.stringify({
+        'date': date,
+        'cid': cid,
+        'pid': pid,
+        'content': content,
+        'result': result,
+      }),
+    });
+    const responseData = await response.json();
+    if (response.ok) {
+      console.log('记录添加成功');
+      fetchData();
+      handleClose();
+      window.alert(responseData.message);
+    } else {
+      console.log('记录添加失败');
+      window.alert(responseData.message);
+    }
   };
 
   return (
@@ -164,6 +174,17 @@ function AddDialog({ open, handleClose, products, customers, fetchData, date }) 
 }
 
 function EditDialog({ open, handleClose, row, fetchData, products, customers, isRequired }) {
+  /*
+  * 编辑记录框
+  * @param {boolean} open - 控制对话框的打开和关闭
+  * @param {function} handleClose - 关闭对话框的回调函数
+  * @param {object} row - 当前记录
+  * @param {function} fetchData - 重新获取数据的回调函数
+  * @param {array} products - 产品列表
+  * @param {array} customers - 客户列表
+  * @param {boolean} isRequired - 是否必填
+  * @returns {JSX.Element}
+ */
 
   const resultOptions = [
     {
@@ -213,7 +234,7 @@ function EditDialog({ open, handleClose, row, fetchData, products, customers, is
     const content = formData.get('content');
 
     console.log('date:', date, 'cid:', state.cid, 'pid:', state.pid, 'content:', content, 'result:', state.result);
-    const response = await fetch('http://127.0.0.1:5000/customerService/updateRecord', {
+    const response = await fetch('http://127.0.0.1:5000/follow_up_management/update_record', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -376,7 +397,7 @@ function ConfirmDialog({ open, handleClose, handleFinalize, row, fetchData }) {
   const sid = row.sid;
 
   const handleConfirm = async () => {
-    const response = await fetch('http://127.0.0.1:5000/customerService/deleteRecord', {
+    const response = await fetch('http://127.0.0.1:5000/follow_up_management/delete_record', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -441,7 +462,7 @@ export default function Notification() {
 
   const handleEventClick = async (info) => {
     const sid = info.event.extendedProps.sid
-    const response = await fetch('http://127.0.0.1:5000/customerService/queryRecord?query=' + encodeURIComponent(sid));
+    const response = await fetch('http://127.0.0.1:5000/follow_up_management/query_record?query=' + encodeURIComponent(sid));
     if (!response.ok) {
       throw new Error('无法获取用户数据');
     }
@@ -481,7 +502,7 @@ export default function Notification() {
 
   const fetchData = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:5000/customerService/queryAllRecords', {
+      const response = await fetch('http://127.0.0.1:5000/follow_up_management/query_all_records', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -494,14 +515,14 @@ export default function Notification() {
       const records = data.records
       const events = convertToCalendarEvents(records, state.titleKey);
 
-      const response2 = await fetch('http://127.0.0.1:5000/dataVisualization/getProductOptions');
+      const response2 = await fetch('http://127.0.0.1:5000/follow_up_management/get_product_options');
       if (!response.ok) {
         throw new Error('无法获取用户数据');
       }
       const data2 = await response2.json();
       const products = data2.products;
 
-      const response3 = await fetch('http://127.0.0.1:5000/customerService/queryCustomers');
+      const response3 = await fetch('http://127.0.0.1:5000/follow_up_management/query_customers');
       if (!response.ok) {
         throw new Error('无法获取用户数据');
       }

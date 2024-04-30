@@ -24,7 +24,7 @@ export default function Home() {
   const fetchData = async (date, range, pid, productName) => {
     try {
       // console.log(range, pid);
-      const response = await fetch('http://127.0.0.1:5000/dataVisualization/getProductOptions');
+      const response = await fetch('http://127.0.0.1:5000/data_visualization/get_product_options');
       if (!response.ok) {
         throw new Error('无法获取用户数据');
       }
@@ -38,7 +38,7 @@ export default function Home() {
         range: range,
         pid: pid,
       });
-      const response2 = await fetch('http://127.0.0.1:5000/dataVisualization/getChartData?' + queryParams.toString());
+      const response2 = await fetch('http://127.0.0.1:5000/data_visualization/get_chart_data?' + queryParams.toString());
       if (!response.ok) {
         throw new Error('无法获取用户数据');
       }

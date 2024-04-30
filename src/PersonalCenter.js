@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { CssBaseline, Box, Paper, Typography, Dialog, DialogTitle, DialogContent, Stack, TextField, DialogActions, Button, List, ListItemButton, ListItemIcon, ListItemText, Divider, Tabs, Tab, Grid, Chip, Radio, RadioGroup, FormControlLabel } from '@mui/material';
 import NavigationBar from './NavigationBar';
-import { LocalPhone, Email, Forum, Badge, Person } from '@mui/icons-material';
+import { LocalPhone, Email, Forum, Badge, Person, Wc } from '@mui/icons-material';
 
 export default function PersonalCenter() {
   const [activeSetting, setActiveSetting] = React.useState('basic');
@@ -19,7 +19,7 @@ export default function PersonalCenter() {
   }, []);
 
   const fetchData = async () => {
-    const response = await fetch('http://127.0.0.1:5000/users/queryPersonalInformation', {
+    const response = await fetch('http://127.0.0.1:5000/personal_center/query_personal_info', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -51,7 +51,7 @@ export default function PersonalCenter() {
   const handleConfirm = async () => {
     const oldp = formData.oldPassword;
     const newp = formData.newPassword;
-    const response = await fetch('http://127.0.0.1:5000/users/changePassword', {
+    const response = await fetch('http://127.0.0.1:5000/personal_center/change_password', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -115,7 +115,7 @@ export default function PersonalCenter() {
       window.alert('请填写完整所有字段');
       return;
     } else {
-      const response = await fetch('http://127.0.0.1:5000/users/updateInformation', {
+      const response = await fetch('http://127.0.0.1:5000/personal_center/update_info', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -162,7 +162,7 @@ export default function PersonalCenter() {
               {activeSetting === 'basic' && (
                 <Box component='form' onSubmit={handleUpdateInfo} >
                   <Typography variant="h6" sx={{ mb: 4 }}>个人信息</Typography>
-                  <Grid container rowSpacing={3} columnSpacing={0}>
+                  <Grid container rowSpacing={3} columnSpacing={0} sx={{ '& > *': { height: 60 } }}>
                     <Grid item xs={1}>
                       <Badge />
                     </Grid>
@@ -183,20 +183,20 @@ export default function PersonalCenter() {
                     </Grid>
                     <Grid item xs={9}>{ 
                         isEdit ?
-                        <TextField name='name' variant="outlined" size='small' required hiddenlabel fullWidth defaultValue={info.name} /> :
+                        <TextField name='name' variant="standard" size='small' required hiddenlabel fullWidth defaultValue={info.name} /> :
                         <Typography>{info.name}</Typography>
                     }</Grid>
                     <Grid item xs={1}>
-                      <Person />
+                      <Wc />
                     </Grid>
                     <Grid item xs={2}>
                       <Typography>性别</Typography>
                     </Grid>
                     <Grid item xs={9}>{ 
                         isEdit ?
-                        (<RadioGroup row defaultValue={info.gender} name="gender">
-                          <FormControlLabel value="0" control={<Radio />} label="男" />
-                          <FormControlLabel value="1" control={<Radio />} label="女" />
+                        (<RadioGroup row value={info.gender} name="gender" sx={{ '& .MuiSvgIcon-root': { fontSize: 16 }, '& .MuiTypography-body1': { fontSize: 16 } }}>
+                          <FormControlLabel value="1" control={<Radio/>} label="男" />
+                          <FormControlLabel value="0" control={<Radio/>} label="女" />
                         </RadioGroup>) :
                         <Typography>{info.gender ? '男' : '女'}</Typography>
                     }</Grid>
@@ -208,7 +208,7 @@ export default function PersonalCenter() {
                     </Grid>
                     <Grid item xs={9}>{ 
                         isEdit ?
-                        <TextField name='phone_no' variant="outlined" size='small' required hiddenlabel fullWidth defaultValue={info.phone_no} type='tel'/> :
+                        <TextField name='phone_no' variant="standard" size='small' required hiddenlabel fullWidth defaultValue={info.phone_no} type='tel'/> :
                         <Typography>{info.phone_no}</Typography>
                     }</Grid>
                     <Grid item xs={1}>
@@ -219,7 +219,7 @@ export default function PersonalCenter() {
                     </Grid>
                     <Grid item xs={9}>{ 
                         isEdit ?
-                        <TextField name='email' variant="outlined" size='small' required hiddenlabel fullWidth defaultValue={info.email} type='email' /> :
+                        <TextField name='email' variant="standard" size='small' required hiddenlabel fullWidth defaultValue={info.email} type='email' /> :
                         <Typography>{info.email}</Typography>
                     }</Grid>
                     <Grid item xs={1}>
@@ -230,7 +230,7 @@ export default function PersonalCenter() {
                     </Grid>
                     <Grid item xs={9}>{ 
                       isEdit ?
-                      <TextField name='wechatid' variant="outlined" size='small' required hiddenlabel fullWidth defaultValue={info.wechatid} /> :
+                      <TextField name='wechatid' variant="standard" size='small' required hiddenlabel fullWidth defaultValue={info.wechatid} /> :
                       <Typography>{info.wechatid}</Typography>
                     }</Grid>
                   </Grid>

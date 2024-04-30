@@ -110,7 +110,7 @@ export default function Login() {
               登录
             </Button>
           </Box>
-          <Snackbar open={open} autoHideDuration={2000} onClose={handleClose}>
+          {/* <Snackbar open={open} autoHideDuration={2000} onClose={handleClose}>
             <Alert
               onClose={handleClose}
               severity="success"
@@ -119,7 +119,7 @@ export default function Login() {
             >
               登录成功！
             </Alert>
-          </Snackbar>
+          </Snackbar> */}
         </Box>
       </Container>
     </Box>

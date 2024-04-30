@@ -43,9 +43,16 @@ class Customer(db.Model):
     cyrs = db.Column(db.Integer, nullable=True)
     current_khjl_days = db.Column(db.Integer, nullable=True)
     total_amount_paid = db.Column(db.Double, nullable=True)
+    pid1 = db.Column(db.Integer, nullable=True)
+    pid2 = db.Column(db.Integer, nullable=True)
+    pid3 = db.Column(db.Integer, nullable=True)
+    pid4 = db.Column(db.Integer, nullable=True)
+    pid5 = db.Column(db.Integer, nullable=True)
+    rec_date = db.Column(db.Date, nullable=True)
+    khjl = db.Column(db.String(20), nullable=False)
 
-class Service(db.Model):
-    __tablename__ = "service"
+class FollowUp(db.Model):
+    __tablename__ = "follow_up"
     sid = db.Column(db.Integer, nullable=False, primary_key=True, autoincrement=True)
     uid = db.Column(db.String(20), nullable=False)
     cid = db.Column(db.Integer, nullable=False)

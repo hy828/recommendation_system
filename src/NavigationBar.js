@@ -25,7 +25,7 @@ export default function NavigationBar() {
     } else if (page === '搜索') {
       navigate('/search');
     } else if (page === '跟进管理') {
-      navigate('/service');
+      navigate('/follow');
     } else if (page === '用户管理') {
       navigate('/permission');
     } else if (page === '通知') {

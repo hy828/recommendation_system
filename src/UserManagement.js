@@ -69,7 +69,7 @@ function EditDialog({ open, handleClose, permission, username, fetchData }) {
 
   // 向后端发送请求，修改用户权限
   const handleConfirm = async () => {
-    const response = await fetch('http://127.0.0.1:5000/permission/updatePermission', {
+    const response = await fetch('http://127.0.0.1:5000/user_management/update_permission', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -119,7 +119,7 @@ function AddDialog({ open, handleClose, fetchData }) {
       return;
     }
 
-    const response = await fetch('http://127.0.0.1:5000/permission/addUser', {
+    const response = await fetch('http://127.0.0.1:5000/user_management/add_user', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -228,12 +228,20 @@ export default function UserManagement() {
       label: '名字',
     },
     {
+      id: 'gender',
+      label: '性别',
+    },
+    {
       id: 'phone_number',
       label: '联系方式',
     },
     {
       id: 'email',
       label: '电子邮件',
+    },
+    {
+      id: 'wechatid',
+      label: '微信号',
     },
     {
       id: 'permission',
@@ -278,7 +286,7 @@ export default function UserManagement() {
     const query = event.target.value; // 得到搜索框的内容
     setSearchQuery(query);
     try {
-      const response = await fetch('http://127.0.0.1:5000/permission/queryUser?query=' + encodeURIComponent(query));
+      const response = await fetch('http://127.0.0.1:5000/user_management/query_user?query=' + encodeURIComponent(query));
       const data = await response.json();
       const users = data.users
       setRows(users);
@@ -295,7 +303,7 @@ export default function UserManagement() {
   // 获取用户数据
   const fetchData = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:5000/permission/queryAllUsers');
+      const response = await fetch('http://127.0.0.1:5000/user_management/query_all_users');
       if (!response.ok) {
         throw new Error('无法获取用户数据');
       }
@@ -376,8 +384,10 @@ export default function UserManagement() {
                 <TableRow key={row.username}>
                   <TableCell>{row.username}</TableCell>
                   <TableCell>{row.name}</TableCell>
+                  <TableCell>{row.gender ? '男' : '女' }</TableCell>
                   <TableCell>{row.phone_number}</TableCell>
                   <TableCell>{row.email}</TableCell>
+                  <TableCell>{row.wechatid}</TableCell>
                   <TableCell>{
                     row.permission === 0 ? 
                     <Chip label='普通用户' color='info' variant='outlined'/> : 

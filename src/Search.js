@@ -235,7 +235,7 @@ export default function Search() {
 
   const fetchData = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:5000/customerManagement/queryAllCustomers');
+      const response = await fetch('http://127.0.0.1:5000/customer_management/query_all_customers');
       if (!response.ok) {
         throw new Error('无法获取用户数据');
       }
@@ -296,7 +296,7 @@ export default function Search() {
       console.log(query)
   
       // 发送搜索请求
-      const response = await fetch('http://127.0.0.1:5000/customerManagement/advancedSearch?query=' + encodeURIComponent(query));
+      const response = await fetch('http://127.0.0.1:5000/customer_management/advanced_search?query=' + encodeURIComponent(query));
       if (!response.ok) {
         throw new Error('无法获取搜索内容');
       }
