@@ -19,6 +19,10 @@ function AddDialog({ open, handleClose, products, customers, fetchData, date }) 
   */
   const name = localStorage.getItem("name"); // 获取目前登录用户的用户名
 
+  const today = new Date();
+  const formattedDate = today.toISOString().split('T')[0];
+  const isRequired = date < formattedDate ? true : false;
+
   const [cid, setCid] = React.useState(null);
   const [pid, setPid] = React.useState(null);
   const [result, setResult] = React.useState(null);
@@ -145,6 +149,7 @@ function AddDialog({ open, handleClose, products, customers, fetchData, date }) 
               onChange={(event, option) => option ? setResult(option.value) : null}
               renderInput={(params) => 
               <TextField {...params}
+                required={isRequired}
                 name="result"
                 margin="dense"
                 label="结果"
@@ -173,7 +178,7 @@ function AddDialog({ open, handleClose, products, customers, fetchData, date }) 
   );
 }
 
-function EditDialog({ open, handleClose, row, fetchData, products, customers, isRequired }) {
+function EditDialog({ open, handleClose, row, fetchData, products, customers }) {
   /*
   * 编辑记录框
   * @param {boolean} open - 控制对话框的打开和关闭
@@ -182,7 +187,6 @@ function EditDialog({ open, handleClose, row, fetchData, products, customers, is
   * @param {function} fetchData - 重新获取数据的回调函数
   * @param {array} products - 产品列表
   * @param {array} customers - 客户列表
-  * @param {boolean} isRequired - 是否必填
   * @returns {JSX.Element}
  */
 
@@ -200,6 +204,10 @@ function EditDialog({ open, handleClose, row, fetchData, products, customers, is
       label: '已购买',
     },
   ];
+
+  const today = new Date();
+  const formattedDate = today.toISOString().split('T')[0];
+  const isRequired = row.date < formattedDate ? true : false;
 
   const [state, setState] = React.useState({
     cid: null,
@@ -293,7 +301,11 @@ function EditDialog({ open, handleClose, row, fetchData, products, customers, is
               )}
               value={customers.find(c => c.id === state.cid) || null}
               onChange={(event, newValue) => {
-                setState({ ...state, cid: newValue.id });
+                var res = null;
+                if (newValue) {
+                  res = newValue.id;
+                }
+                setState({ ...state, cid: res });
               }}
               renderInput={(params) => 
               <TextField {...params}
@@ -331,7 +343,11 @@ function EditDialog({ open, handleClose, row, fetchData, products, customers, is
               )}
               value={products.find(p => p.id === state.pid) || null}
               onChange={(event, newValue) => {
-                setState({ ...state, pid: newValue.id });
+                var res = null;
+                if (newValue) {
+                  res = newValue.id;
+                }
+                setState({ ...state, pid: res });
               }}
               renderInput={(params) => 
               <TextField {...params} 
@@ -351,7 +367,11 @@ function EditDialog({ open, handleClose, row, fetchData, products, customers, is
               getOptionLabel={(option) => option.label}
               value={resultOptions.find(r => r.id === state.result) || null}
               onChange={(event, newValue) => {
-                setState({ ...state, result: newValue.id });
+                var res = null;
+                if (newValue) {
+                  res = newValue.id;
+                }
+                setState({ ...state, result: res });
               }}
               renderInput={(params) => 
               <TextField {...params} 
@@ -594,8 +614,7 @@ export default function Notification() {
             row={state.selectedRecord} 
             fetchData={fetchData} 
             products={state.productOptions} 
-            customers={state.customerData} 
-            isRequired={true}/>
+            customers={state.customerData}/>
         </Paper>
       </Box>
     </Box>

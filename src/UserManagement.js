@@ -39,9 +39,9 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     paddingLeft: `calc(1em + ${theme.spacing(4)})`,
     transition: theme.transitions.create('width'),
     [theme.breakpoints.up('sm')]: {
-      width: '12ch',
+      width: '60ch',
       '&:focus': {
-          width: '20ch',
+          width: '60ch',
       },
     },
   },
@@ -109,13 +109,28 @@ function AddDialog({ open, handleClose, fetchData }) {
     const formData = new FormData(event.currentTarget); // 获取表单数据
     const id = formData.get('id');
     const name = formData.get('name');
+    const gender = formData.get('gender');
+    const phone = formData.get('phone');
+    const email = formData.get('email');
+    const wechatid = formData.get('wechatid');
     const permission = formData.get('permission');
     const password = formData.get('password');
     const confirmPassword = formData.get('confirmPassword');
 
+    const mailregex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]+$/i;
+    const telregex = /^1[3-9]\d{9}$/;
+
     // 校验数据
     if (password !== confirmPassword) {
       alert('密码和确认密码不一致');
+      return;
+    }
+    if (!mailregex.test(email)) {
+      window.alert('请输入正确的邮箱格式');
+      return;
+    }
+    if (!telregex.test(phone)) {
+      window.alert('请输入正确的电话号码格式');
       return;
     }
 
@@ -127,6 +142,10 @@ function AddDialog({ open, handleClose, fetchData }) {
       body: JSON.stringify({
         'id': id,
         'name': name,
+        'gender': gender,
+        'phone': phone,
+        'email': email,
+        'wechatid': wechatid,
         'permission': permission,
         'password': password,
       }),
@@ -153,7 +172,6 @@ function AddDialog({ open, handleClose, fetchData }) {
             autoFocus
             required
             margin="dense"
-            id="id"
             name="id"
             label="用户名"
             type="text"
@@ -164,9 +182,42 @@ function AddDialog({ open, handleClose, fetchData }) {
             autoFocus
             required
             margin="dense"
-            id="name"
             name="name"
             label="名字"
+            type="text"
+            fullWidth
+            variant="standard"
+          />
+          <RadioGroup row defaultValue="1" name="gender">
+            <FormControlLabel value="1" control={<Radio />} label="男" />
+            <FormControlLabel value="0" control={<Radio />} label="女" />
+          </RadioGroup>
+          <TextField
+            autoFocus
+            required
+            margin="dense"
+            name="phone"
+            label="电话号码"
+            type="tel"
+            fullWidth
+            variant="standard"
+          />
+          <TextField
+            autoFocus
+            required
+            margin="dense"
+            name="email"
+            label="电子邮件"
+            type="email"
+            fullWidth
+            variant="standard"
+          />
+          <TextField
+            autoFocus
+            required
+            margin="dense"
+            name="wechatid"
+            label="微信号"
             type="text"
             fullWidth
             variant="standard"
@@ -179,7 +230,6 @@ function AddDialog({ open, handleClose, fetchData }) {
             autoFocus
             required
             margin="dense"
-            id="password"
             name="password"
             label="密码"
             type="password"
@@ -190,7 +240,6 @@ function AddDialog({ open, handleClose, fetchData }) {
             autoFocus
             required
             margin="dense"
-            id="confirmPassword"
             name="confirmPassword"
             label="确认密码"
             type="password"
@@ -232,7 +281,7 @@ export default function UserManagement() {
       label: '性别',
     },
     {
-      id: 'phone_number',
+      id: 'phone',
       label: '联系方式',
     },
     {
@@ -346,7 +395,7 @@ export default function UserManagement() {
                 <SearchIcon onClick={handleInputChange} />
               </SearchIconWrapper>
               <StyledInputBase
-                placeholder="搜索..."
+                placeholder="输入ID、名字、电话号码、电子邮件或微信号搜索用户"
                 inputProps={{ 'aria-label': 'search' }}
                 value={searchQuery}
                 onChange={handleInputChange}
@@ -385,7 +434,7 @@ export default function UserManagement() {
                   <TableCell>{row.username}</TableCell>
                   <TableCell>{row.name}</TableCell>
                   <TableCell>{row.gender ? '男' : '女' }</TableCell>
-                  <TableCell>{row.phone_number}</TableCell>
+                  <TableCell>{row.phone}</TableCell>
                   <TableCell>{row.email}</TableCell>
                   <TableCell>{row.wechatid}</TableCell>
                   <TableCell>{

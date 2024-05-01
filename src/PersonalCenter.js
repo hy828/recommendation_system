@@ -105,14 +105,24 @@ export default function PersonalCenter() {
     event.preventDefault(); // 阻止表单默认提交行为
     const formData = new FormData(event.currentTarget); // 获取表单数据
     const name = formData.get('name');
-    const phone_no = formData.get('phone_no');
+    const phone = formData.get('phone');
     const email = formData.get('email');
     const wechatid = formData.get('wechatid');
-    console.log({name, phone_no, email, wechatid});
+    const gender = formData.get('gender');
+    console.log({name, phone, email, wechatid});
+
+    const mailregex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]+$/i;
+    const telregex = /^1[3-9]\d{9}$/;
     
     // 校验数据
-    if (!name || !phone_no || !email || !wechatid) {
+    if (!name || !phone || !email || !wechatid || !gender) {
       window.alert('请填写完整所有字段');
+      return;
+    } else if (!mailregex.test(email)) {
+      window.alert('请输入正确的邮箱格式');
+      return;
+    } else if (!telregex.test(phone)) {
+      window.alert('请输入正确的电话号码格式');
       return;
     } else {
       const response = await fetch('http://127.0.0.1:5000/personal_center/update_info', {
@@ -123,9 +133,10 @@ export default function PersonalCenter() {
         },
         body: JSON.stringify({
           'name': name,
-          'phone_no': phone_no,
+          'phone': phone,
           'email': email,
           'wechatid': wechatid,
+          'gender': gender,
         }),
       });
       const responseData = await response.json(); // 解析返回的 JSON 数据
@@ -208,8 +219,8 @@ export default function PersonalCenter() {
                     </Grid>
                     <Grid item xs={9}>{ 
                         isEdit ?
-                        <TextField name='phone_no' variant="standard" size='small' required hiddenlabel fullWidth defaultValue={info.phone_no} type='tel'/> :
-                        <Typography>{info.phone_no}</Typography>
+                        <TextField name='phone' variant="standard" size='small' required hiddenlabel fullWidth defaultValue={info.phone} type='tel'/> :
+                        <Typography>{info.phone}</Typography>
                     }</Grid>
                     <Grid item xs={1}>
                       <Email />

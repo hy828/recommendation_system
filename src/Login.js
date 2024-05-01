@@ -21,7 +21,7 @@ export default function Login() {
       const username = new FormData(event.currentTarget).get('username');
       const password = new FormData(event.currentTarget).get('password');
       console.log('登录界面-用户名和密码：', {username, password});
-      const response = await fetch('http://127.0.0.1:5000/users/login', {
+      const response = await fetch('http://127.0.0.1:5000/personal_center/login', {
           method: 'POST',
           headers: {
               'Content-Type': 'application/json',

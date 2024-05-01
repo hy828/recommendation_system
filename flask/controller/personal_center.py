@@ -1,9 +1,4 @@
 from flask import Blueprint, request, jsonify
-from models import User
-from exts import db
-import jwt
-import bcrypt
-from config import jwt_secret_key
 from service.personal_center import PersonalCenter
 
 bp = Blueprint('personal_center', __name__)
@@ -14,26 +9,10 @@ def login(): # 处理登录
     print(f"登录-用户名和密码: {data}")
     username = data.get('username')
     password = data.get('password')
-    PersonalCenter.login(username, password)
-    user = User.query.filter_by(id=username).first()
-    if user is None:
-        print('登录失败，用户名不存在')
-        return jsonify({'message': '用户名不存在'}), 400
-    
-    if bcrypt.checkpw(password.encode("utf-8"), user.password.encode("utf-8")):
-        headers = {
-            "alg": "HS256",
-            "typ": "JWT"
-        }
-        payload = {
-            "user_id": username,
-        }
-        token = jwt.encode(payload=payload, key=jwt_secret_key, algorithm='HS256', headers=headers)
-        print('登录成功')
-        return jsonify({'message': '登录成功', 'token': token, "userPermission": user.permission, "name": user.name}), 200
-    else:
-        print('登录失败，密码错误')
-        return jsonify({'message': '密码错误'}), 400
+    res, token, permission, name = PersonalCenter.login(username, password)
+    if res: return jsonify({'message': '登录成功', 'token': token, "userPermission": permission, "name": name}), 200
+    elif res == -1: return jsonify({'message': '用户名不存在'}), 400
+    else: return jsonify({'message': '密码错误'}), 400
 
 @bp.route('/personal_center/change_password', methods=['POST'])
 def change_password():
@@ -60,8 +39,8 @@ def update_info():
     token = request.headers.get('Authorization')
     name = data.get('name')
     gender = data.get('gender')
-    phone_no = data.get('phone_no')
+    phone = data.get('phone')
     email = data.get('email')
     wechatid = data.get('wechatid')
-    PersonalCenter.update_info(token, name, gender, phone_no, email, wechatid)
+    PersonalCenter.update_info(token, name, gender, phone, email, wechatid)
     return jsonify({'message': '更新成功'}), 200

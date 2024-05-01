@@ -8,7 +8,7 @@ import PersonalCenter from './PersonalCenter'
 import Notification from './Notification'
 import Calendar from './Calendar'
 import { Routes, Route, Navigate } from 'react-router-dom'
-import { createTheme, ThemeProvider, getContrastRatio } from '@mui/material/styles';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 const defaultTheme = createTheme({
   palette: {

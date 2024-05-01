@@ -1,12 +1,100 @@
 import * as React from 'react';
-import { Box, CssBaseline, Paper, Typography, Grid, Table, TableBody, TableCell, TableHead, TableRow, TableContainer, TableSortLabel, Chip, Stack, List, ListItem, ListItemText } from '@mui/material';
+import { Box, CssBaseline, Paper, Typography, Grid, Table, TableBody, TableCell, TableHead, TableRow, TableContainer, TableSortLabel, Chip, Stack, List, ListItem, ListItemText, IconButton, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, TextField, Link } from '@mui/material';
+import { ModeEdit } from '@mui/icons-material';
 import NavigationBar from './NavigationBar';
 import { useLocation } from 'react-router-dom';
 import { visuallyHidden } from '@mui/utils';
 
-function Details({ customerDetails }) {
+function ViewDialog({ open, onClose, data }) {
+  return (
+    <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
+      <DialogTitle>客户经理信息</DialogTitle>
+      <DialogContent>
+        <DialogContentText>姓名：{data.name}</DialogContentText>
+        <DialogContentText>性别：{data.gender ? '男' : '女'}</DialogContentText>
+        <DialogContentText>电话：{data.phone}</DialogContentText>
+        <DialogContentText>邮箱：{data.email}</DialogContentText>
+        <DialogContentText>微信号：{data.wechatid}</DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose}>关闭</Button>
+      </DialogActions>
+    </Dialog>
+  );
+}
+
+function EditDialog({ open, onClose, clickedItem, fetchData, id }) {
+  const handleSubmit = async (event) => {
+    event.preventDefault(); // 阻止表单默认提交行为
+    const formData = new FormData(event.currentTarget); // 获取表单数据
+    const key = clickedItem.key;
+    const value = formData.get('edit');
+
+    console.log(id);
+    console.log(key);
+    console.log(value);
+    const response = await fetch('http://127.0.0.1:5000/customer_detail/update_record', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        'id': id,
+        'key': key,
+        'value': value,
+      }),
+    });
+    const responseData = await response.json();
+    if (response.ok) {
+      console.log(key,'记录更新成功');
+      fetchData();
+      onClose();
+      window.alert(responseData.message);
+    } else {
+      console.log(key,'记录更新失败');
+      window.alert(responseData.message);
+    }
+  };
+
+  return (
+    <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth PaperProps={{
+      component: 'form', onSubmit: handleSubmit }}>
+      <DialogTitle>编辑 {clickedItem.key}</DialogTitle>
+      <DialogContent>
+        <TextField 
+          required 
+          fullWidth
+          hiddenLabel
+          margin="dense"
+          name="edit"
+          // label={clickedItem.key}
+          type="text" 
+          variant="standard"  
+          defaultValue={clickedItem.value}
+        />
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose}>取消</Button>
+        <Button type="submit">确定</Button>
+      </DialogActions>
+    </Dialog>
+  );
+}
+
+function Details({ customerDetails, fetchData, id }) {
+  const userPermission = localStorage.getItem("userPermission");
   const basicInfo = ['注册资本', '成立天数', '行业门类', '从业人数', '企业规模', '企业规模名称', '客户类型', '客户数量', '供应商数量', '信用等级', '纳税人状态代码', '增值纳税人类型'];
   const otherInfo = ['企税风险', '最近个税实际申报人数', '月均进项票量', '月均销项票量', '进项发票风险', '销项发票风险'];
+  const [state, setState] = React.useState({
+    open: false,
+    clickedItem: {null: null},
+  })
+
+  const handleEditClick = (key, value) => {
+    console.log('Clicked item:', { key, value });
+    setState({ open: true, clickedItem: { key, value } });
+  };
+
   return ( // 
     <Box>
       <Grid container rowSpacing={3} sx={{ mb: 1.5 }}>
@@ -14,12 +102,17 @@ function Details({ customerDetails }) {
           if (basicInfo.includes(key)) {
             return (
               <Grid key={key} item xs={2} sx={{ flexDirection: 'row' }}>
-                <Typography variant="subtitle2" color='secondary.main' fontWeight='700'>{key}</Typography>
+                <Typography variant="subtitle2" color='secondary.main' fontWeight='700'>
+                  {key}
+                  {userPermission && (<IconButton sx={{ fontSize: 13, mb: 0.2, p: 0.5 }} onClick={() => handleEditClick(key, value)} >
+                    <ModeEdit fontSize="inherit" />
+                  </IconButton>)}
+                </Typography>
                 <Typography variant="body1">{value}</Typography>
               </Grid>
             );
           }
-          return null; // Render nothing if the key is not in basicInfo
+          return null;
         })}
       </Grid>
       <Grid container rowSpacing={2}>
@@ -27,7 +120,12 @@ function Details({ customerDetails }) {
           if (otherInfo.includes(key)) {
             return (
               <Grid key={key} item xs={4} sx={{ flexDirection: 'row' }}>
-                <Typography variant="subtitle2" color='secondary.main' fontWeight='700'>{key}</Typography>
+                <Typography variant="subtitle2" color='secondary.main' fontWeight='700'>
+                  {key}
+                  {userPermission && (<IconButton sx={{ fontSize: 13, mb: 0.2, p: 0.5 }} onClick={() => handleEditClick(key, value)} >
+                    <ModeEdit fontSize="inherit" />
+                  </IconButton>)}
+                </Typography>
                 <Typography variant="body1">{value}</Typography>
               </Grid>
             );
@@ -35,6 +133,7 @@ function Details({ customerDetails }) {
           return null; // Render nothing if the key is not in basicInfo
         })}
       </Grid>
+      <EditDialog open={state.open} onClose={() => setState({...state, open: false})} clickedItem={state.clickedItem} fetchData={fetchData} id={id}/>
     </Box>
   )
 }
@@ -59,6 +158,10 @@ export default function CustomerDetail() {
   const [serviceRecords, setServiceRecords] = React.useState([]);
   const [order, setOrder] = React.useState('desc');
   const [orderBy, setOrderBy] = React.useState('date');
+  const [dialog, setDialog] = React.useState({
+    open: false,
+    data: {},
+  });
 
   const headCells = [
     {
@@ -120,7 +223,7 @@ export default function CustomerDetail() {
   }, []);
 
   const fetchData = async () => {
-    console.log(id)
+    // console.log(id)
     try {
       const query = id;
       const response = await fetch('http://127.0.0.1:5000/customer_detail/query_details?query=' + encodeURIComponent(query))
@@ -150,6 +253,22 @@ export default function CustomerDetail() {
     }
   };
 
+  const handleOpenDialog = async () => {
+    try {
+      const response = await fetch('http://127.0.0.1:5000/customer_detail/query_user?query=' + encodeURIComponent(customerDetails['当前客户经理']));
+      if (!response.ok) {
+        throw new Error('无法获取客户经理信息');
+      }
+      const data = await response.json();
+      console.log(data);
+      const detail = data.detail;
+      console.log(detail);
+      setDialog({ open: true, data: detail });
+    } catch (error) {
+      console.error('无法获取客户经理信息:', error);
+    }
+  }
+
   return (
     <Box>
       <CssBaseline />
@@ -169,7 +288,7 @@ export default function CustomerDetail() {
                 {customerDetails['客户名称']}
                 <Chip label={customerDetails['会员类型']} variant="outlined" size='small' color={getChipColor(customerDetails['会员类型'])} sx={{ ml: 2 }}/>
               </Typography>
-              <Details customerDetails={Object.entries(customerDetails)}/>
+              <Details customerDetails={Object.entries(customerDetails)} fetchData={fetchData} id={id}/>
             </Paper>
           </Grid>
           <Grid item xs={12} md={5} lg={4}>
@@ -208,7 +327,7 @@ export default function CustomerDetail() {
               <Typography color='primary.main' sx={{ fontWeight: 600, mr: 1 }}>现任客户经理</Typography>
               </Grid>
               <Grid item xs={2}>
-              <Typography sx={{ mr: 10 }}>{customerDetails['当前客户经理']}</Typography>
+              <Link component='button' underline='none' variant='body1' sx={{ mr: 10, p: 0, color: 'black' }} onClick={handleOpenDialog}>{customerDetails['当前客户经理']}</Link>
               </Grid>
               <Grid item xs={2}>
               <Typography color='primary.main' sx={{ fontWeight: 600, mr: 1 }}>现任客户经理持续天数</Typography>
@@ -217,6 +336,7 @@ export default function CustomerDetail() {
               <Typography sx={{ mr: 10 }}>{customerDetails['当前客户经理持续天数']}天</Typography>
               </Grid>
             </Grid>
+            
           </Grid>
           <Grid item xs={12}>
             <TableContainer 
@@ -252,7 +372,9 @@ export default function CustomerDetail() {
                   {visibleRows.map((row) => (
                     <TableRow key={row.sid}>
                       <TableCell>{row.date}</TableCell>
-                      <TableCell>{row.name}</TableCell>
+                      <TableCell>
+                        <Link component='button' underline='none' variant='body2' sx={{ m: 0, p: 0, color: 'black' }} onClick={handleOpenDialog}>{row.name}</Link>
+                      </TableCell>
                       <TableCell>{row.product}</TableCell>
                       <TableCell>{row.content}</TableCell>
                       <TableCell>{row.result}</TableCell>
@@ -263,6 +385,7 @@ export default function CustomerDetail() {
             </TableContainer>
           </Grid>
         </Grid>
+        <ViewDialog open={dialog.open} onClose={() => setDialog({ open: false, data: {} })} data={dialog.data}/>
       </Box>
     </Box>
   )
