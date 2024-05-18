@@ -1,19 +1,9 @@
 import * as React from 'react';
-import { Avatar, Button, CssBaseline, TextField, Box, Typography, Container, Snackbar, Alert } from '@mui/material';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import { Button, CssBaseline, TextField, Box, Typography, Container } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
 export default function Login() {
   const navigate = useNavigate();
-  const [open, setOpen] = React.useState(false);
-
-  const handleClose = (event, reason) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-
-    setOpen(false);
-  };
 
   // 处理登录请求给后端，提交用户名和密码
   const handleSubmit = async (event) => {
@@ -26,7 +16,7 @@ export default function Login() {
           headers: {
               'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ username, password }),
+          body: JSON.stringify({ 'username': username, 'password': password }),
       });
       const responseData = await response.json(); // 解析返回的 JSON 数据
 
@@ -70,9 +60,6 @@ export default function Login() {
           >
             辅助营销推荐系统平台
           </Typography>
-          {/* <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-            <LockOutlinedIcon />
-          </Avatar> */}
           <Typography component="h5" variant="h5">
             登录
           </Typography>
@@ -97,10 +84,6 @@ export default function Login() {
               id="password"
               autoComplete="current-password"
             />
-            {/* <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
-              label="Remember me"
-            /> */}
             <Button
               type="submit"
               fullWidth
@@ -110,16 +93,6 @@ export default function Login() {
               登录
             </Button>
           </Box>
-          {/* <Snackbar open={open} autoHideDuration={2000} onClose={handleClose}>
-            <Alert
-              onClose={handleClose}
-              severity="success"
-              variant="filled"
-              sx={{ width: '100%' }}
-            >
-              登录成功！
-            </Alert>
-          </Snackbar> */}
         </Box>
       </Container>
     </Box>

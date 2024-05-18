@@ -65,16 +65,18 @@ export default function PersonalCenter() {
     const responseData = await response.json(); // 解析返回的 JSON 数据
 
     if (response.ok) {
-      console.log('修改密码成功');
+      console.log(responseData.message);
+      window.alert(responseData.message);
     } else {
-      console.log('修改密码失败');
+      console.log(responseData.message);
+      window.alert(responseData.message);
     }
     setFormData({
       oldPassword: '', 
       newPassword: '', 
       confirmPassword: '',
       openConfirmDialog: false });
-    window.alert(responseData.message);
+    // window.alert(responseData.message);
   };
 
   const handleChangePassword = async (event) => {
@@ -142,11 +144,13 @@ export default function PersonalCenter() {
       const responseData = await response.json(); // 解析返回的 JSON 数据
 
       if (response.ok) {
-        console.log('个人信息更新成功');
+        console.log(responseData.message);
         fetchData();
         setIsEdit(0);
+        window.alert(responseData.message);
       } else {
-        console.log('个人信息更新失败');
+        console.log(responseData.message);
+        window.alert(responseData.message);
       }
     }
   };
@@ -183,7 +187,7 @@ export default function PersonalCenter() {
                     <Grid item xs={9}>
                       <Typography>
                         {info.id}
-                        <Chip label={info.permission ? '高级用户' : '普通用户'} variant="outlined" size='small' sx={{ ml: 2 }}/>
+                        <Chip label={info.permission ? '管理员' : '客户经理'} variant="outlined" size='small' sx={{ ml: 2 }}/>
                       </Typography>
                     </Grid>
                     <Grid item xs={1}>

@@ -10,7 +10,7 @@ def login(): # 处理登录
     username = data.get('username')
     password = data.get('password')
     res, token, permission, name = PersonalCenter.login(username, password)
-    if res: return jsonify({'message': '登录成功', 'token': token, "userPermission": permission, "name": name}), 200
+    if res == 1: return jsonify({'message': '登录成功', 'token': token, "userPermission": permission, "name": name}), 200
     elif res == -1: return jsonify({'message': '用户名不存在'}), 400
     else: return jsonify({'message': '密码错误'}), 400
 

@@ -18,6 +18,7 @@ class PersonalCenter:
             }
             payload = { # JWT 载荷
                 "user_id": username,
+                "user_permission": user.permission
             }
             token = jwt.encode(payload=payload, key=jwt_secret_key, algorithm='HS256', headers=headers) # 生成 token
             # print('登录成功')

@@ -7,6 +7,11 @@ class ProductDAO:
         return name
     
     @staticmethod
+    def get_description(id): # 获取某个产品的名字
+        description = Product.query.filter_by(id=id).first().description
+        return description
+    
+    @staticmethod
     def get_all(): # 获取所有产品信息
         products = Product.query.all()
         return products

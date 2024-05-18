@@ -3,13 +3,15 @@ from exts import db
 class User(db.Model):
     __tablename__ = "user"
     id = db.Column(db.String(20), nullable=False, primary_key=True)
-    password = db.Column(db.String(20), nullable=False)
+    password = db.Column(db.String(200), nullable=False)
     name = db.Column(db.String(20), nullable=False)
     permission = db.Column(db.Integer, nullable=False)
     phone = db.Column(db.String(20), nullable=False)
     email = db.Column(db.String(20), nullable=False)
     gender = db.Column(db.Integer, nullable=False)
     wechatid = db.Column(db.String(20), nullable=False)
+    sales_month = db.Column(db.Integer, nullable=False)
+    sales_season = db.Column(db.Integer, nullable=False)
 
 class Product(db.Model):
     __tablename__ = "product"
@@ -17,6 +19,7 @@ class Product(db.Model):
     name = db.Column(db.String(20), nullable=False)
     category = db.Column(db.String(20), nullable=False)
     requirement = db.Column(db.String(20), nullable=True)
+    description = db.Column(db.String(200), nullable=False)
 
 class Customer(db.Model):
     __tablename__ = "customer"
@@ -26,17 +29,17 @@ class Customer(db.Model):
     qygmmc = db.Column(db.String(20), nullable=True)
     nsrzt_dm = db.Column(db.String(20), nullable=True)
     out_invoice_high_risk = db.Column(db.String(20), nullable=True)
-    out_invoice_avg = db.Column(db.String(20), nullable=True)
+    out_invoice_avg = db.Column(db.Integer, nullable=True)
     in_invoice_high_risk = db.Column(db.String(20), nullable=True)
-    in_invoice_avg = db.Column(db.String(20), nullable=True)
-    invoice_suppliers = db.Column(db.String(20), nullable=True)
+    in_invoice_avg = db.Column(db.Integer, nullable=True)
+    invoice_suppliers = db.Column(db.Integer, nullable=True)
     vip_type = db.Column(db.String(20), nullable=True)
-    monthly_declare_iit_num_last = db.Column(db.String(20), nullable=True)
-    scale = db.Column(db.String(20), nullable=True)
+    monthly_declare_iit_num_last = db.Column(db.Integer, nullable=True)
+    scale = db.Column(db.Integer, nullable=True)
     industry_top = db.Column(db.String(20), nullable=True)
     vat_taxpayer_type = db.Column(db.String(20), nullable=True)
     credit_rating = db.Column(db.String(20), nullable=True)
-    invoice_customers = db.Column(db.String(20), nullable=True)
+    invoice_customers = db.Column(db.Integer, nullable=True)
     company_tax_risk = db.Column(db.String(20), nullable=True)
     zczb = db.Column(db.Integer, nullable=True)
     established_days = db.Column(db.Integer, nullable=True)

@@ -25,9 +25,8 @@ class FollowUpManagement:
             record_data = {
                 'sid': record.sid,
                 'date': str(record.date),
-                'customerName': customer,
-                'product': product,
                 'result': result,
+                'title': customer + ': ' + product
             }
             record_list.append(record_data)
         return record_list

@@ -1,6 +1,5 @@
 import * as React from 'react';
-import { Box, CssBaseline, Paper, Typography, Grid, Table, TableBody, TableCell, TableHead, TableRow, TableContainer, TableSortLabel, Chip, Stack, List, ListItem, ListItemText, IconButton, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, TextField, Link } from '@mui/material';
-import { ModeEdit } from '@mui/icons-material';
+import { Box, CssBaseline, Paper, Typography, Grid, Table, TableBody, TableCell, TableHead, TableRow, TableContainer, TableSortLabel, Chip, Stack, List, ListItem, ListItemText, MenuItem, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, TextField, Link, Collapse } from '@mui/material';
 import NavigationBar from './NavigationBar';
 import { useLocation } from 'react-router-dom';
 import { visuallyHidden } from '@mui/utils';
@@ -23,55 +22,252 @@ function ViewDialog({ open, onClose, data }) {
   );
 }
 
-function EditDialog({ open, onClose, clickedItem, fetchData, id }) {
+function EditDialog({ open, onClose, data, fetchData, id }) {
+
   const handleSubmit = async (event) => {
     event.preventDefault(); // 阻止表单默认提交行为
     const formData = new FormData(event.currentTarget); // 获取表单数据
-    const key = clickedItem.key;
-    const value = formData.get('edit');
-
-    console.log(id);
-    console.log(key);
-    console.log(value);
-    const response = await fetch('http://127.0.0.1:5000/customer_detail/update_record', {
+    const vip_type = formData.get('vip_type');
+    const cyrs = formData.get('cyrs');
+    const scale = formData.get('scale');
+    const invoice_suppliers = formData.get('invoice_suppliers');
+    const credit_rating = formData.get('credit_rating');
+    const vat_taxpayer_type = formData.get('vat_taxpayer_type');
+    const invoice_customers = formData.get('invoice_customers');
+    const khlx = formData.get('khlx');
+    const established_days = formData.get('established_days');
+    const zczb = formData.get('zczb');
+    const nsrzt_dm = formData.get('nsrzt_dm');
+    const industry_top = formData.get('industry_top');
+    
+    const response = await fetch('http://127.0.0.1:5000/customer_management/update_record', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         'id': id,
-        'key': key,
-        'value': value,
+        'data': {
+          'vip_type': vip_type,
+          'cyrs': cyrs,
+          'scale': scale,
+          'invoice_suppliers': invoice_suppliers,
+          'credit_rating': credit_rating,
+          'vat_taxpayer_type': vat_taxpayer_type,
+          'invoice_customers': invoice_customers,
+          'khlx': khlx,
+          'established_days': established_days,
+          'zczb': zczb,
+          'nsrzt_dm': nsrzt_dm,
+          'industry_top': industry_top,
+        }
+        
       }),
     });
     const responseData = await response.json();
     if (response.ok) {
-      console.log(key,'记录更新成功');
+      console.log(responseData.message);
       fetchData();
       onClose();
       window.alert(responseData.message);
     } else {
-      console.log(key,'记录更新失败');
+      console.log(responseData.message);
       window.alert(responseData.message);
     }
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth PaperProps={{
+    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth PaperProps={{
       component: 'form', onSubmit: handleSubmit }}>
-      <DialogTitle>编辑 {clickedItem.key}</DialogTitle>
+      <DialogTitle>编辑客户信息</DialogTitle>
       <DialogContent>
-        <TextField 
-          required 
-          fullWidth
-          hiddenLabel
-          margin="dense"
-          name="edit"
-          // label={clickedItem.key}
-          type="text" 
-          variant="standard"  
-          defaultValue={clickedItem.value}
-        />
+        <Grid container spacing={2}>
+          <Grid item xs={3}>
+            <TextField
+              fullWidth
+              required
+              margin="dense"
+              name="vip_type"
+              label="会员类型"
+              select
+              variant="standard"
+              defaultValue={data['会员类型']}
+            >
+              {['未知', 'VIP', '过期VIP', '非VIP'].map((option) => (
+                <MenuItem key={option} value={option}>
+                  {option}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Grid>
+          <Grid item xs={3}>
+            <TextField
+              fullWidth
+              required
+              margin="dense"
+              name="cyrs"
+              label="从业人数"
+              type="number"
+              variant="standard"  
+              defaultValue={data['从业人数']}
+            />
+          </Grid>
+          <Grid item xs={3}>
+            <TextField
+              fullWidth
+              required
+              margin="dense"
+              name="scale"
+              label="企业规模"
+              type="number"
+              variant="standard"  
+              defaultValue={data['企业规模']}
+            />
+          </Grid>
+          {/* <Grid item xs={3}>
+            <TextField
+              fullWidth
+              required
+              margin="dense"
+              name="qygmmc"
+              label="企业规模名称"
+              select
+              variant="standard"  
+            />
+          </Grid> */}
+          <Grid item xs={3}>
+            <TextField
+              fullWidth
+              required
+              margin="dense"
+              name="invoice_suppliers"
+              label="供应商数量"
+              type="number"
+              variant="standard"  
+              defaultValue={data['供应商数量']}
+            />
+          </Grid>
+          <Grid item xs={3}>
+            <TextField
+              fullWidth
+              required
+              margin="dense"
+              name="credit_rating"
+              label="信用等级"
+              select
+              variant="standard"  
+              defaultValue={data['信用等级']}
+            >
+              {['未知', 'A', 'B', 'C', 'D', 'M'].map((option) => (
+                <MenuItem key={option} value={option}>
+                  {option}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Grid>
+          <Grid item xs={3}>
+            <TextField
+              fullWidth
+              required
+              margin="dense"
+              name="vat_taxpayer_type"
+              label="增值纳税人类型"
+              select
+              variant="standard"  
+              defaultValue={data['增值纳税人类型']}
+            >
+              {['未知', '一般纳税人', '小规模纳税人'].map((option) => (
+                <MenuItem key={option} value={option}>
+                  {option}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Grid>
+          <Grid item xs={3}>
+            <TextField
+              fullWidth
+              required
+              margin="dense"
+              name="invoice_customers"
+              label="客户数量"
+              type="number"
+              variant="standard"  
+              defaultValue={data['客户数量']}
+            />
+          </Grid>
+          <Grid item xs={3}>
+            <TextField
+              fullWidth
+              required
+              margin="dense"
+              name="khlx"
+              label="客户类型"
+              select
+              variant="standard"
+              defaultValue={data['客户类型']}
+            >
+              {['单位用户', '个人代理'].map((option) => (
+                <MenuItem key={option} value={option}>
+                  {option}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Grid>
+          <Grid item xs={3}>
+            <TextField
+              fullWidth
+              required
+              margin="dense"
+              name="established_days"
+              label="成立天数"
+              type="number"
+              variant="standard" 
+              defaultValue={data['成立天数']} 
+            />
+          </Grid>
+          <Grid item xs={3}>
+            <TextField
+              fullWidth
+              required
+              margin="dense"
+              name="zczb"
+              label="注册资本"
+              type="number"
+              variant="standard"  
+              defaultValue={data['注册资本']}
+            />
+          </Grid>
+          <Grid item xs={3}>
+            <TextField
+              fullWidth
+              required
+              margin="dense"
+              name="nsrzt_dm"
+              label="纳税人状态代码"
+              select
+              variant="standard"  
+              defaultValue={data['纳税人状态代码']}
+            >
+              {['未知', '03', '07', '99'].map((option) => (
+                <MenuItem key={option} value={option}>
+                  {option}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Grid>
+          <Grid item xs={3}>
+            <TextField
+              fullWidth
+              required
+              margin="dense"
+              name="industry_top"
+              label="行业门类"
+              type="text"
+              variant="standard"  
+              defaultValue={data['行业门类']}
+            />
+          </Grid>
+        </Grid>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>取消</Button>
@@ -82,18 +278,8 @@ function EditDialog({ open, onClose, clickedItem, fetchData, id }) {
 }
 
 function Details({ customerDetails, fetchData, id }) {
-  const userPermission = localStorage.getItem("userPermission");
   const basicInfo = ['注册资本', '成立天数', '行业门类', '从业人数', '企业规模', '企业规模名称', '客户类型', '客户数量', '供应商数量', '信用等级', '纳税人状态代码', '增值纳税人类型'];
   const otherInfo = ['企税风险', '最近个税实际申报人数', '月均进项票量', '月均销项票量', '进项发票风险', '销项发票风险'];
-  const [state, setState] = React.useState({
-    open: false,
-    clickedItem: {null: null},
-  })
-
-  const handleEditClick = (key, value) => {
-    console.log('Clicked item:', { key, value });
-    setState({ open: true, clickedItem: { key, value } });
-  };
 
   return ( // 
     <Box>
@@ -102,12 +288,7 @@ function Details({ customerDetails, fetchData, id }) {
           if (basicInfo.includes(key)) {
             return (
               <Grid key={key} item xs={2} sx={{ flexDirection: 'row' }}>
-                <Typography variant="subtitle2" color='secondary.main' fontWeight='700'>
-                  {key}
-                  {userPermission && (<IconButton sx={{ fontSize: 13, mb: 0.2, p: 0.5 }} onClick={() => handleEditClick(key, value)} >
-                    <ModeEdit fontSize="inherit" />
-                  </IconButton>)}
-                </Typography>
+                <Typography variant="subtitle2" color='secondary.main' fontWeight='700'>{key}</Typography>
                 <Typography variant="body1">{value}</Typography>
               </Grid>
             );
@@ -120,12 +301,7 @@ function Details({ customerDetails, fetchData, id }) {
           if (otherInfo.includes(key)) {
             return (
               <Grid key={key} item xs={4} sx={{ flexDirection: 'row' }}>
-                <Typography variant="subtitle2" color='secondary.main' fontWeight='700'>
-                  {key}
-                  {userPermission && (<IconButton sx={{ fontSize: 13, mb: 0.2, p: 0.5 }} onClick={() => handleEditClick(key, value)} >
-                    <ModeEdit fontSize="inherit" />
-                  </IconButton>)}
-                </Typography>
+                <Typography variant="subtitle2" color='secondary.main' fontWeight='700'>{key}</Typography>
                 <Typography variant="body1">{value}</Typography>
               </Grid>
             );
@@ -133,7 +309,6 @@ function Details({ customerDetails, fetchData, id }) {
           return null; // Render nothing if the key is not in basicInfo
         })}
       </Grid>
-      <EditDialog open={state.open} onClose={() => setState({...state, open: false})} clickedItem={state.clickedItem} fetchData={fetchData} id={id}/>
     </Box>
   )
 }
@@ -156,34 +331,25 @@ export default function CustomerDetail() {
   const [customerDetails, setCustomerDetails] = React.useState({});
   const [recommendationResult, setRecommendationResult] = React.useState({});
   const [serviceRecords, setServiceRecords] = React.useState([]);
+  const [expanded, setExpanded] = React.useState(null);
   const [order, setOrder] = React.useState('desc');
   const [orderBy, setOrderBy] = React.useState('date');
-  const [dialog, setDialog] = React.useState({
+  const [viewDialog, setViewDialog] = React.useState({
     open: false,
     data: {},
   });
+  const [editDialog, setEditDialog] = React.useState({
+    open: false,
+    data: {},
+  });
+  const userPermission = localStorage.getItem("userPermission");
 
   const headCells = [
-    {
-      id: 'date',
-      label: '日期',
-    },
-    {
-      id: 'name',
-      label: '负责人',
-    },
-    {
-      id: 'product',
-      label: '产品功能',
-    },
-    {
-      id: 'content',
-      label: '内容',
-    },
-    {
-      id: 'result',
-      label: '结果',
-    }
+    { id: 'date', label: '日期' },
+    { id: 'name', label: '负责人' },
+    { id: 'product', label: '产品功能' },
+    { id: 'content', label: '内容' },
+    { id: 'result', label: '结果' }
   ]
 
   const onRequestSort = (event, property) => {
@@ -226,7 +392,7 @@ export default function CustomerDetail() {
     // console.log(id)
     try {
       const query = id;
-      const response = await fetch('http://127.0.0.1:5000/customer_detail/query_details?query=' + encodeURIComponent(query))
+      const response = await fetch('http://127.0.0.1:5000/customer_management/query_details?query=' + encodeURIComponent(query))
       if (!response.ok) {
         throw new Error('无法获取用户数据');
       }
@@ -255,7 +421,7 @@ export default function CustomerDetail() {
 
   const handleOpenDialog = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:5000/customer_detail/query_user?query=' + encodeURIComponent(customerDetails['当前客户经理']));
+      const response = await fetch('http://127.0.0.1:5000/customer_management/query_user?query=' + encodeURIComponent(customerDetails['当前客户经理']));
       if (!response.ok) {
         throw new Error('无法获取客户经理信息');
       }
@@ -263,11 +429,16 @@ export default function CustomerDetail() {
       console.log(data);
       const detail = data.detail;
       console.log(detail);
-      setDialog({ open: true, data: detail });
+      setViewDialog({ open: true, data: detail });
     } catch (error) {
       console.error('无法获取客户经理信息:', error);
     }
   }
+
+  const handleEditClick = (key, value) => {
+    console.log('Clicked item:', { key, value });
+    setEditDialog({ open: true, data: customerDetails })
+  };
 
   return (
     <Box>
@@ -284,9 +455,11 @@ export default function CustomerDetail() {
                 height: 330,
               }}
             >
-              <Typography variant="h5" sx={{ fontWeight: 600, mb: 3 }}>
+              <Typography variant="h5" sx={{ fontWeight: 600, mb: 3, display: 'flex' }}>
                 {customerDetails['客户名称']}
-                <Chip label={customerDetails['会员类型']} variant="outlined" size='small' color={getChipColor(customerDetails['会员类型'])} sx={{ ml: 2 }}/>
+                <Chip label={customerDetails['会员类型']} variant="outlined" size='small' color={getChipColor(customerDetails['会员类型'])} sx={{ ml: 2, verticalAlign: 'middle' }}/>
+                <Box sx={{ flexGrow: 1 }}/>
+                {userPermission === '1' && <Button variant='contained' onClick={handleEditClick}>编辑</Button>}
               </Typography>
               <Details customerDetails={Object.entries(customerDetails)} fetchData={fetchData} id={id}/>
             </Paper>
@@ -294,23 +467,28 @@ export default function CustomerDetail() {
           <Grid item xs={12} md={5} lg={4}>
             <Paper
               sx={{
-                p: 2,
+                py: 2,
                 display: 'flex',
                 flexDirection: 'column',
-                height: 330,
+                height: 330
               }}
             >
-              <Stack direction='row'>
-                <Typography variant='h6' color='primary.main' sx={{ fontWeight: 600, mr: 14, mb: 1 }}>功能推荐</Typography>
+              <Stack direction='row' sx={{ px: 2 }}>
+                <Typography variant='h6' color='primary.main' sx={{ fontWeight: 600, mr: 14, mb: 1 }}>产品推荐</Typography>
                 <Typography variant='subtitle2' sx={{ pt: 0.5, mb: 1 }}>最近一次更新：{recommendationResult.date}</Typography>
               </Stack>
-              <List>
-                {/* Render five fixed items */}
+              <List sx={{ overflowY: 'auto' }}>
                 {Object.entries(recommendationResult).map(([key, value]) => (
                   key != 'date' && (
-                  <ListItem key={key}>
-                    <ListItemText primary={`${key.slice(3)}. ${value}`} />
-                  </ListItem>
+                  <React.Fragment key={key}>
+                    <ListItem button onClick={() => setExpanded(expanded === key ? null : key)}>
+                      <ListItemText primary={`${key.slice(3)}. ${value.name}`} />
+                    </ListItem>
+                    <Collapse in={expanded === key} timeout="auto" unmountOnExit sx={{ px: 2 }}>
+                      <Typography color='green' fontWeight='700' variant='body2' component='div'>{value.similarity}企业已使用此产品，其中有{value.similarity2}企业规模相同</Typography>
+                      <Typography variant='body2' component='div'>{value.description}</Typography>
+                    </Collapse>
+                  </React.Fragment>
                 )))}
               </List>
             </Paper>
@@ -385,7 +563,8 @@ export default function CustomerDetail() {
             </TableContainer>
           </Grid>
         </Grid>
-        <ViewDialog open={dialog.open} onClose={() => setDialog({ open: false, data: {} })} data={dialog.data}/>
+        <ViewDialog open={viewDialog.open} onClose={() => setViewDialog({ open: false, data: {} })} data={viewDialog.data}/>
+        <EditDialog open={editDialog.open} onClose={() => setEditDialog({ open: false, data: {} })} data={editDialog.data} fetchData={fetchData} id={id}/>
       </Box>
     </Box>
   )

@@ -75,3 +75,21 @@ class UserDAO:
         else:
             # print('密码修改失败，原密码错误')
             return 0
+    
+    @staticmethod
+    def get_all_sales_month(): # 获取所有用户的月度销售额
+        users = User.query.all()
+        sales_month = [
+            {'id': user.id, 'name': user.name, 'sales': user.sales_month}
+            for user in users
+        ]
+        return sales_month
+    
+    @staticmethod
+    def get_all_sales_season(): # 获取所有用户的季度销售额
+        users = User.query.all()
+        sales_season = [
+            {'id': user.id, 'name': user.name, 'sales': user.sales_season}
+            for user in users
+        ]
+        return sales_season

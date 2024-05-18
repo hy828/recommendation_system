@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Box, CssBaseline, Paper, Grid, Select, MenuItem, TextField, Button, TableCell, TableRow, TableHead, TableBody, Table, TableContainer, TableSortLabel } from '@mui/material';
+import { Box, CssBaseline, Paper, Grid, Select, MenuItem, TextField, Button, TableCell, TableRow, TableHead, TableBody, Table, TableContainer, TableSortLabel, Stack, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import NavigationBar from './NavigationBar';
 import { visuallyHidden } from '@mui/utils';
@@ -25,7 +25,7 @@ function SearchInputRow({ num, searchTypes, bindTypes, searchTypeValue, searchVa
           ))}
         </Select>
       </Grid>
-      <Grid item xs={6}>
+      <Grid item xs={7}>
         <TextField
           fullWidth
           name={searchValueName}
@@ -39,8 +39,8 @@ function SearchInputRow({ num, searchTypes, bindTypes, searchTypeValue, searchVa
           onChange={(event) => onSearchValueChange(event.target.value)}
         />
       </Grid>
-      { num === 1 ? <Grid item xs={3} /> : (
-        <Grid item xs={3}>
+      { num === 1 ? <Grid item xs={2} /> : (
+        <Grid item xs={2}>
           <Select
             fullWidth
             name={bindTypeName}
@@ -136,9 +136,10 @@ function CustomerManagement({ rows }) {
   );
 
   return (
-    <Box sx={{ mt: 3 }}>
+    <Box sx={{ mt: 2 }}>
       <CssBaseline />
-      <TableContainer sx={{ maxHeight: 400 }} component={Paper}>
+      <Typography variant='body1' sx={{ fontWeight: 700, mb: 1, ml: 1 }}>共显示{visibleRows.length}条记录</Typography>
+      <TableContainer sx={{ maxHeight: 460 }} component={Paper}>
         <Table stickyHeader>
           <TableHead>
             <TableRow>
@@ -332,26 +333,32 @@ export default function Search() {
       <CssBaseline />
       <NavigationBar />
       <Box sx={{ ml: 30, my: 3, mr: 5 }}>
-        <Paper sx={{ px:5, pt:1, height: 250 }} component='form' onSubmit={handleSearch}>
-          {searchInputs.map((input, index) => (
-            <Box key={index} sx={{ my: 2 }}>
-              <SearchInputRow
-                num={index + 1}
-                searchTypes={searchTypes}
-                bindTypes={bindTypes}
-                searchTypeValue={input.searchTypeValue}
-                searchValue={input.searchValue}
-                bindTypeValue={input.bindTypeValue}
-                onSearchTypeChange={(value) => handleSearchInputChange(index + 1, 'searchTypeValue', value)}
-                onSearchValueChange={(value) => handleSearchInputChange(index + 1, 'searchValue', value)}
-                onBindTypeChange={(value) => handleSearchInputChange(index + 1, 'bindTypeValue', value)}
-              />
-            </Box>
-          ))}
-            <Box fullWidth sx={{ display: "flex", justifyContent: 'flex-end' }}>
-              <Button variant="contained" onClick={handleClearSearch} sx={{ mr: 3 }}>重置</Button>
+        <Paper sx={{ px:5, pt:1, height: 170 }} component='form' onSubmit={handleSearch}>
+          <Grid container columnSpacing={3}>
+            <Grid item xs={11}>
+            {searchInputs.map((input, index) => (
+              <Box key={index} sx={{ my: 1 }}>
+                <SearchInputRow
+                  num={index + 1}
+                  searchTypes={searchTypes}
+                  bindTypes={bindTypes}
+                  searchTypeValue={input.searchTypeValue}
+                  searchValue={input.searchValue}
+                  bindTypeValue={input.bindTypeValue}
+                  onSearchTypeChange={(value) => handleSearchInputChange(index + 1, 'searchTypeValue', value)}
+                  onSearchValueChange={(value) => handleSearchInputChange(index + 1, 'searchValue', value)}
+                  onBindTypeChange={(value) => handleSearchInputChange(index + 1, 'bindTypeValue', value)}
+                />
+              </Box>
+            ))}
+            </Grid>
+            <Grid item xs={1}>
+            <Stack spacing={1} direction="column" sx={{ mt: 7 }}>
+              <Button variant="contained" onClick={handleClearSearch}>重置</Button>
               <Button variant="contained" type="submit">搜索</Button>
-            </Box>
+            </Stack>
+            </Grid>
+          </Grid>
         </Paper>
         <CustomerManagement rows={rows}/>
       </Box>

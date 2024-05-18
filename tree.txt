@@ -1,0 +1,43 @@
+│  
+├─flask（后端代码）
+│  │  app.py（服务器入口，包含主要配置和启动代码）
+│  │  config.py（数据库的配置文件，包含数据库连接信息、密钥、调试模式等）
+│  │  exts.py（扩展文件，独立db的建立，避免出现循环import依赖）
+│  │  models.py（数据模型定义，包含数据库表的定义和字段的定义）
+│  │  
+│  ├─controller（负责处理用户的请求并调度相应的业务逻辑）
+│  │	customer_management.py（客户管理模块）
+│  │	data_visualization.py（数据可视化模块）
+│  │ 	follow_up_management.py（跟进管理模块）
+│  │	personal_center.py（个人中心模块）
+│  │  	user_management.py（用户管理模块）
+│  │          
+│  ├─dao（负责访问数据库，执行查询、插入、更新和删除等操作）
+│  │	activation.py（数据库表activation）
+│  │	customer.py（数据库表customer）
+│  │ 	description.py（数据库表description）
+│  │ 	follow_up.py（数据库表follow_up）
+│  │	product.py（数据库表product）
+│  │	user.py（数据库表user）
+│  │          
+│  ├─service（负责系统的业务逻辑和数据处理）
+│  	 	customer_management.py（客户管理模块）
+│  		data_visualization.py（数据可视化模块）
+│  	 	follow_up_management.py（跟进管理模块）
+│  		personal_center.py（个人中心模块）
+│  	 	user_management.py（用户管理模块）
+│            
+├─node_modules  
+├─public
+└─src（前端代码）
+        App.js（系统主组件，包含路由、布局和全局状态）
+        Calendar.js（跟进管理界面）
+        CustomerDetail.js（客户详情界面）
+        DataVisualization.js（数据可视化界面）
+        Home.js（数据可视化界面）
+        index.js（系统入口，负责将根组件渲染到 HTML 页面上，启动整个应用的运行）
+        Login.js（登录界面）
+        NavigationBar.js（侧边导航栏）
+        PersonalCenter.js（个人中心界面）
+        Search.js（搜索界面）
+        UserManagement.js（同事列表/权限管理界面）

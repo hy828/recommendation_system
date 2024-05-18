@@ -1,7 +1,8 @@
 import * as React from 'react';
 import { styled, alpha } from '@mui/material/styles';
 import SearchIcon from '@mui/icons-material/Search';
-import { Box, CssBaseline, InputBase, Table, TableBody, TableCell, TableHead, TableRow, Dialog, DialogActions, DialogContent, DialogTitle, Button, TextField, Stack, Radio, FormControlLabel, RadioGroup, Paper, TableContainer, TableSortLabel, Chip } from '@mui/material';
+import { Box, CssBaseline, InputBase, Table, TableBody, TableCell, TableHead, TableRow, Dialog, DialogActions, DialogContent, DialogTitle, Button, TextField, Stack, Radio, FormControlLabel, RadioGroup, Paper, TableContainer, TableSortLabel, Chip, Typography } from '@mui/material';
+import { LooksOne, LooksTwo, Looks3, Looks4, Looks5, Stars } from '@mui/icons-material';
 import NavigationBar from './NavigationBar';
 import { visuallyHidden } from '@mui/utils';
 
@@ -74,18 +75,18 @@ function EditDialog({ open, handleClose, permission, username, fetchData }) {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ username }),
+      body: JSON.stringify({ 'username': username }),
     });
     const responseData = await response.json(); // 解析返回的 JSON 数据
 
     if (response.ok) {
-      console.log(username,'权限更新成功');
+      console.log(username, responseData.message);
       // 更新权限后关闭对话框并触发更新表格的操作
       fetchData();
       handleClose(); // 关闭对话框
       window.alert(responseData.message);
     } else {
-      console.log(username,'权限更新失败');
+      console.log(username, responseData.message);
       // 显示错误信息
       window.alert(responseData.message);
     }
@@ -151,15 +152,18 @@ function AddDialog({ open, handleClose, fetchData }) {
       }),
     });
 
+    const responseData = await response.json(); // 解析返回的 JSON 数据
     if (response.ok) {
       // 处理提交成功的逻辑
-      console.log('用户添加成功');
+      console.log(responseData.message);
       fetchData();
       handleClose(); // 关闭对话框
+      window.alert(responseData.message);
     } else {
       // 处理提交失败的逻辑
-      console.log('用户添加失败');
+      console.log(responseData.message);
       // 显示错误信息或者其他处理
+      window.alert(responseData.message);
     }
   };
 
@@ -223,8 +227,8 @@ function AddDialog({ open, handleClose, fetchData }) {
             variant="standard"
           />
           <RadioGroup row defaultValue="0" name="permission">
-            <FormControlLabel value="0" control={<Radio />} label="普通用户" />
-            <FormControlLabel value="1" control={<Radio />} label="高级用户" />
+            <FormControlLabel value="0" control={<Radio />} label="客户经理" />
+            <FormControlLabel value="1" control={<Radio />} label="管理员" />
           </RadioGroup>
           <TextField
             autoFocus
@@ -258,6 +262,8 @@ function AddDialog({ open, handleClose, fetchData }) {
 
 export default function UserManagement() {
   const [rows, setRows] = React.useState([]);
+  const [rankMonth, setRankMonth] = React.useState([]);
+  const [rankSeason, setRankSeason] = React.useState([]);
   const [openEditDialog, setOpenEditDialog] = React.useState(false);
   const [openAddDialog, setOpenAddDialog] = React.useState(false);
   const [selectedUserPermission, setSelectedUserPermission] = React.useState(null);
@@ -266,37 +272,25 @@ export default function UserManagement() {
   const userPermission = localStorage.getItem("userPermission");
   const [order, setOrder] = React.useState('asc');
   const [orderBy, setOrderBy] = React.useState('id');
+  const h = userPermission === '1' ? 590 : 450;
 
   const headCells = [
-    {
-      id: 'username',
-      label: 'ID',
-    },
-    {
-      id: 'name',
-      label: '名字',
-    },
-    {
-      id: 'gender',
-      label: '性别',
-    },
-    {
-      id: 'phone',
-      label: '联系方式',
-    },
-    {
-      id: 'email',
-      label: '电子邮件',
-    },
-    {
-      id: 'wechatid',
-      label: '微信号',
-    },
-    {
-      id: 'permission',
-      label: '权限级别',
-    },
+    { id: 'username', label: 'ID' },
+    { id: 'name', label: '名字' },
+    { id: 'gender', label: '性别' },
+    { id: 'phone', label: '联系方式' },
+    { id: 'email', label: '电子邮件' },
+    { id: 'wechatid', label: '微信号' },
+    { id: 'permission', label: '权限级别' },
   ];
+
+  const styles = [
+    { fontSize: '24px', fontWeight: 'bold', color: 'gold' },
+    { fontSize: '20px', fontWeight: 'bold', color: 'gold' },
+    { fontSize: '20px', fontWeight: 'bold', color: 'gold' },
+    { fontSize: '16px', fontWeight: 'normal' },
+    { fontSize: '16px', fontWeight: 'normal' },
+];
 
   const onRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -335,7 +329,14 @@ export default function UserManagement() {
     const query = event.target.value; // 得到搜索框的内容
     setSearchQuery(query);
     try {
-      const response = await fetch('http://127.0.0.1:5000/user_management/query_user?query=' + encodeURIComponent(query));
+      const response = await fetch('http://127.0.0.1:5000/user_management/query_user', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': localStorage.getItem("token")
+        },
+        body: JSON.stringify({ 'query': query }),
+      });
       const data = await response.json();
       const users = data.users
       setRows(users);
@@ -352,14 +353,22 @@ export default function UserManagement() {
   // 获取用户数据
   const fetchData = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:5000/user_management/query_all_users');
+      const response = await fetch('http://127.0.0.1:5000/user_management/query_all_users', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': localStorage.getItem("token")
+      }})
       if (!response.ok) {
         throw new Error('无法获取用户数据');
       }
       const data = await response.json();
       const users = data.users
-      // console.log(users)
+      const rankMonth = data.rank_month
+      const rankSeason = data.rank_season
       setRows(users); // 设置数据到state中
+      setRankMonth(rankMonth);
+      setRankSeason(rankSeason);
     } catch (error) {
       console.error('用户数据获取失败:', error);
     }
@@ -382,50 +391,89 @@ export default function UserManagement() {
   const handleCloseAddDialog = () => {
     setOpenAddDialog(false);
   };
-  
   return (
     <Box>
       <CssBaseline />
       <NavigationBar />
-      <Box  sx={{ ml: 30, my: 5, mr: 5 }}>
-        <Stack direction="row" sx={{ flexGrow: 1, mb: 5 }}>
-          <Paper sx={{ flexGrow: 1, px: 5, py: 0.5, mr: 5 }}>
+      <Box  sx={{ ml: 30, my: 3, mr: 5 }}>
+        {
+          userPermission === '0' && 
+          <Paper sx={{ height: 120, mb: 3, display: 'flex', flexDirection: 'column', p: 2 }}>
+            <Typography sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', mb: 2 }}>
+              <Typography color='red' variant='h6' fontWeight={700} marginRight={5} ><Stars sx={{ verticalAlign: 'middle' }}/>季度销售排行榜<Stars sx={{ verticalAlign: 'middle' }}/></Typography>
+              {rankMonth.map((user, index) => (
+                <Typography key={user.id} sx={styles[index]} marginRight={3}>
+                  {index === 0 && <LooksOne sx={{ verticalAlign: 'middle' }}/>}
+                  {index === 1 && <LooksTwo sx={{ verticalAlign: 'middle' }}/>}
+                  {index === 2 && <Looks3 sx={{ verticalAlign: 'middle' }}/>}
+                  {index === 3 && <Looks4 sx={{ verticalAlign: 'middle' }}/>}
+                  {index === 4 && <Looks5 sx={{ verticalAlign: 'middle' }}/>}
+                  {`${user.name} ${user.sales}元`}
+                </Typography>
+              ))}
+            </Typography>
+            <Typography sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+            <Typography color='red' variant='h6' fontWeight={700} marginRight={5} ><Stars sx={{ verticalAlign: 'middle' }}/>月度销售排行榜<Stars sx={{ verticalAlign: 'middle' }}/></Typography>
+              {rankSeason.map((user, index) => (
+                <Typography key={user.id} sx={styles[index]} marginRight={3}>
+                  {index === 0 && <LooksOne sx={{ verticalAlign: 'middle' }}/>}
+                  {index === 1 && <LooksTwo sx={{ verticalAlign: 'middle' }}/>}
+                  {index === 2 && <Looks3 sx={{ verticalAlign: 'middle' }}/>}
+                  {index === 3 && <Looks4 sx={{ verticalAlign: 'middle' }}/>}
+                  {index === 4 && <Looks5 sx={{ verticalAlign: 'middle' }}/>}
+                  {`${user.name} ${user.sales}元`}
+                </Typography>
+              ))}
+            </Typography>
+          </Paper>
+        }
+        <Stack direction="row" sx={{ flexGrow: 1, mb: 1 }}>
+          <Paper sx={{ flexGrow: 1, px: 5, py: 0.5 }}>
             <Search>
               <SearchIconWrapper>
                 <SearchIcon onClick={handleInputChange} />
               </SearchIconWrapper>
               <StyledInputBase
-                placeholder="输入ID、名字、电话号码、电子邮件或微信号搜索用户"
+                placeholder="搜索ID、名字、电话号码、电子邮件或微信号"
                 inputProps={{ 'aria-label': 'search' }}
                 value={searchQuery}
                 onChange={handleInputChange}
               />
             </Search>
           </Paper>
-          <Button variant="contained" onClick={handleOpenAddDialog}>添加用户</Button>
+          { userPermission === '1' && <Button variant="contained" onClick={handleOpenAddDialog} sx={{ ml: 5 }}>添加用户</Button> }
           <AddDialog open={openAddDialog} handleClose={handleCloseAddDialog} fetchData={fetchData} />
         </Stack>
-        <TableContainer sx={{ maxHeight: 560 }} component={Paper}>
+        <Typography variant='body1' sx={{ fontWeight: 700, mb: 0.5, ml: 1 }}>共显示{visibleRows.length}条记录</Typography>
+        <TableContainer sx={{ height: h, maxHeight: h }} component={Paper}>
           <Table stickyHeader>
             <TableHead>
               <TableRow>
-                {headCells.map((headCell) => (
-                  <TableCell>
-                    <TableSortLabel
-                      active={orderBy === headCell.id}
-                      direction={orderBy === headCell.id ? order : 'asc'}
-                      onClick={createSortHandler(headCell.id)}
-                    >
-                      {headCell.label}
-                      {orderBy === headCell.id ? (
-                        <Box component="span" sx={visuallyHidden}>
-                          {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-                        </Box>
-                      ) : null}
-                    </TableSortLabel>
-                  </TableCell>
-                ))}
-                <TableCell align="right"></TableCell>
+                {headCells.map((headCell) => {
+                  if (headCell.id === 'permission' && userPermission === '0') {
+                    return null;
+                  }
+                  return (
+                    <TableCell>
+                      <TableSortLabel
+                        active={orderBy === headCell.id}
+                        direction={orderBy === headCell.id ? order : 'asc'}
+                        onClick={createSortHandler(headCell.id)}
+                      >
+                        {headCell.label}
+                        {orderBy === headCell.id ? (
+                          <Box component="span" sx={visuallyHidden}>
+                            {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                          </Box>
+                        ) : null}
+                      </TableSortLabel>
+                    </TableCell>
+                  )
+                })}
+                {
+                  userPermission === '1' && (<TableCell align="right"></TableCell>)
+                }
+                
               </TableRow>
             </TableHead>
             <TableBody>
@@ -437,15 +485,19 @@ export default function UserManagement() {
                   <TableCell>{row.phone}</TableCell>
                   <TableCell>{row.email}</TableCell>
                   <TableCell>{row.wechatid}</TableCell>
-                  <TableCell>{
-                    row.permission === 0 ? 
-                    <Chip label='普通用户' color='info' variant='outlined'/> : 
-                    <Chip label='高级用户' color='success' variant='outlined'/>
-                  }</TableCell>
-                  <TableCell align="right">{ 
-                    userPermission === '1' &&
-                      <Button variant="text" onClick={() => handleOpenEditDialog(row.permission, row.username)}>修改权限</Button>
-                  }</TableCell>
+                  { userPermission === '1' && (
+                    <TableCell>{
+                      row.permission === 0 ? 
+                      <Chip label='客户经理' color='info' variant='outlined'/> : 
+                      <Chip label='管理员' color='success' variant='outlined'/>
+                    }</TableCell>)}
+                  { userPermission === '1' && (
+                    <TableCell align="right">
+                      { row.permission === 0 && <Button variant="text" onClick={() => handleOpenEditDialog(row.permission, row.username)}>修改权限</Button>}
+                      
+                    </TableCell>
+                  )}
+                  
                 </TableRow>
               ))}
               <EditDialog open={openEditDialog} handleClose={handleCloseEditDialog} permission={selectedUserPermission} username={selectedUsername} fetchData={fetchData} />

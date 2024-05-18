@@ -67,12 +67,12 @@ function AddDialog({ open, handleClose, products, customers, fetchData, date }) 
     });
     const responseData = await response.json();
     if (response.ok) {
-      console.log('记录添加成功');
+      console.log(responseData.message);
       fetchData();
       handleClose();
       window.alert(responseData.message);
     } else {
-      console.log('记录添加失败');
+      console.log(responseData.message);
       window.alert(responseData.message);
     }
   };
@@ -259,12 +259,12 @@ function EditDialog({ open, handleClose, row, fetchData, products, customers }) 
     const responseData = await response.json();
 
     if (response.ok) {
-      console.log(row.sid,'记录更新成功');
+      console.log(row.sid, responseData.message);
       fetchData();
       handleClose();
       window.alert(responseData.message);
     } else {
-      console.log(row.sid,'记录更新失败');
+      console.log(row.sid, responseData.message);
       window.alert(responseData.message);
     }
   };
@@ -422,17 +422,17 @@ function ConfirmDialog({ open, handleClose, handleFinalize, row, fetchData }) {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ sid }),
+      body: JSON.stringify({ 'sid': sid }),
     });
     const responseData = await response.json();
 
     if (response.ok) {
-      console.log(sid,'记录删除成功');
+      console.log(sid, responseData.message);
       fetchData();
       handleFinalize();
       window.alert(responseData.message);
     } else {
-      console.log(sid,'记录删除失败');
+      console.log(sid, responseData.message);
       window.alert(responseData.message);
     }
   };
@@ -458,7 +458,6 @@ export default function Notification() {
     selectedRecord: {},
     productOptions: [],
     customerData: [],
-    titleKey: 'customerName',
     events: [],
     records: [],
   });
@@ -496,23 +495,15 @@ export default function Notification() {
     handleDialogToggle(date, {}, 'openAddDialog', true);
   }
 
-  const convertToCalendarEvents = (data, titleKey) => {
+  const convertToCalendarEvents = (data) => {
     return data.map(record => ({
       id: record.sid,
-      title: record[titleKey],  // Dynamically set the title based on user's choice
+      title: record.title,
       date: record.date,
       color: resultColorMapping[record.result],
       extendedProps: {
         sid: record.sid,
       }
-    }));
-  };
-
-  const toggleTitleKey = () => {
-    setState(prevState => ({
-      ...prevState,
-      titleKey: prevState.titleKey === 'customerName' ? 'product' : 'customerName',
-      events: convertToCalendarEvents(state.records, prevState.titleKey === 'customerName' ? 'product' : 'customerName')
     }));
   };
 
@@ -533,7 +524,7 @@ export default function Notification() {
       }
       const data = await response.json();
       const records = data.records
-      const events = convertToCalendarEvents(records, state.titleKey);
+      const events = convertToCalendarEvents(records);
 
       const response2 = await fetch('http://127.0.0.1:5000/follow_up_management/get_product_options');
       if (!response.ok) {
@@ -561,17 +552,28 @@ export default function Notification() {
     }
   };
 
+  const Legend = ({ colorMapping }) => (
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+      {Object.entries(colorMapping).map(([status, color]) => (
+        <div key={status} style={{ display: 'flex', alignItems: 'center', marginRight: '15px' }}>
+          <div style={{ width: '15px', height: '15px', backgroundColor: color, marginRight: '5px' }}></div>
+          <span>{status}</span>
+        </div>
+      ))}
+    </div>
+  );
+  
   return (
     <Box>
       <CssBaseline />
       <NavigationBar />
-      <Box sx={{ ml: 30, my: 3, mr: 5 }}>
+      <Box sx={{ ml: 30, my: 2, mr: 5 }}>
         <Paper
           sx={{
-            p: 2,
+            p: 1,
             display: 'flex',
             flexDirection: 'column',
-            height: 680,
+            height: 690,
           }}>
           <FullCalendar
             plugins={[dayGridPlugin, interactionPlugin, listPlugin]}
@@ -580,21 +582,18 @@ export default function Notification() {
             headerToolbar={{
               start: 'prev,next today', // Buttons on the left
               center: 'title',   // Title in the center
-              end: 'dayGridMonth,listMonth changeTitleKey'     // Custom element on the right
+              end: 'dayGridMonth,listMonth'     // Custom element on the right
             }}
-            buttonText={{today: '今天', dayGridMonth: '网格', listMonth: '列表'}}
-            customButtons={{
-              changeTitleKey: {
-                text: state.titleKey === 'customerName' ? '产品' : '客户',
-                click: toggleTitleKey
-              }
-            }}
+            buttonText={{today: '今天', dayGridMonth: '网格', listMonth: '列表', prev: '上一月', next: '下一月'}}
             weekends={true}
             events={state.events}
             eventClick={handleEventClick}
             dateClick={handleDateClick}
             height="100%"
+            dayMaxEventRows={true} // 显示 “更多” 链接来限制显示的事件数
+            dayMaxEvents={3} // 每个日期格子中最多显示的事件数
           />
+          <Legend colorMapping={resultColorMapping} />
           <AddDialog
             open={state.openAddDialog}
             handleClose={
