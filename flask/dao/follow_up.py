@@ -9,7 +9,13 @@ class FollowUpDAO:
     
     @staticmethod
     def get_records_by_uid(id): # 获取某个用户的所有跟进记录
-        records = FollowUp.query.filter_by(uid=id).all()
+        records = FollowUp.query.with_entities(
+                        FollowUp.cid,
+                        FollowUp.pid,
+                        FollowUp.sid,
+                        FollowUp.date,
+                        FollowUp.result,
+                    ).filter_by(uid=id).all()
         return records
     
     @staticmethod

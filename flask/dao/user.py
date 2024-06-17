@@ -10,7 +10,15 @@ class UserDAO:
     
     @staticmethod
     def get_all(): # 获取所有用户信息
-        users = User.query.all()
+        users = User.query.with_entities(
+                    User.id,
+                    User.name,
+                    User.permission,
+                    User.phone,
+                    User.email,
+                    User.gender,
+                    User.wechatid,
+                ).all()
         return users
     
     @staticmethod
@@ -22,7 +30,15 @@ class UserDAO:
     
     @staticmethod
     def get_users(keyword): # 模糊搜索，获取所有符合条件的用户
-        users = User.query.filter(User.id.like(f'%{keyword}%') | User.name.like(f'%{keyword}%') | User.phone.like(f'%{keyword}%') | User.email.like(f'%{keyword}%') | User.wechatid.like(f'%{keyword}%')).all()
+        users = User.query.with_entities(
+                    User.id,
+                    User.name,
+                    User.permission,
+                    User.phone,
+                    User.email,
+                    User.gender,
+                    User.wechatid,
+                ).filter(User.id.like(f'%{keyword}%') | User.name.like(f'%{keyword}%') | User.phone.like(f'%{keyword}%') | User.email.like(f'%{keyword}%') | User.wechatid.like(f'%{keyword}%')).all()
         return users
     
     @staticmethod
@@ -38,6 +54,8 @@ class UserDAO:
         new_user.wechatid = wechatid
         new_user.password = password
         new_user.permission = permission
+        new_user.sales_month = 0
+        new_user.sales_season = 0
         db.session.add(new_user)
         db.session.commit()
         return 1
@@ -78,7 +96,11 @@ class UserDAO:
     
     @staticmethod
     def get_all_sales_month(): # 获取所有用户的月度销售额
-        users = User.query.all()
+        users = User.query.with_entities(
+                    User.id,
+                    User.name,
+                    User.sales_month
+                ).all()
         sales_month = [
             {'id': user.id, 'name': user.name, 'sales': user.sales_month}
             for user in users
@@ -87,7 +109,11 @@ class UserDAO:
     
     @staticmethod
     def get_all_sales_season(): # 获取所有用户的季度销售额
-        users = User.query.all()
+        users = User.query.with_entities(
+                    User.id,
+                    User.name,
+                    User.sales_season
+                ).all()
         sales_season = [
             {'id': user.id, 'name': user.name, 'sales': user.sales_season}
             for user in users

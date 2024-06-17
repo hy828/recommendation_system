@@ -63,3 +63,15 @@ class UserManagement:
         encrypted_password = bcrypt.hashpw(password, bcrypt.gensalt())
         res = UserDAO.add_user(id, name, gender, phone, email, wechatid, encrypted_password, permission)
         return res
+    
+    @staticmethod
+    def get_user(id): # 获取某个用户的详细信息
+        user = UserDAO.get_user(id)
+        detail = {
+            'name': user.name,
+            'gender': user.gender,
+            'phone': user.phone,
+            'email': user.email,
+            'wechatid': user.wechatid,
+        }
+        return detail

@@ -15,12 +15,26 @@ class CustomerDAO:
     
     @staticmethod
     def get_all(): # 获取所有客户信息
-        customers = Customer.query.all()
+        customers = Customer.query.with_entities(
+                        Customer.id,
+                        Customer.name,
+                        Customer.khlx,
+                        Customer.qygmmc,
+                        Customer.scale,
+                        Customer.industry_top
+                    ).all()
         return customers
     
     @staticmethod
     def get_customers(sql): # 高级搜索
-        customers = Customer.query.filter(sql).all()
+        customers = Customer.query.with_entities(
+                        Customer.id,
+                        Customer.name,
+                        Customer.khlx,
+                        Customer.qygmmc,
+                        Customer.scale,
+                        Customer.industry_top
+                    ).filter(sql).all()
         return customers
     
     @staticmethod

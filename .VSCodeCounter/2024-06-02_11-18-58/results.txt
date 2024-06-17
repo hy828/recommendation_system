@@ -1,0 +1,40 @@
+Date : 2024-06-02 11:18:58
+Directory : c:\Users\acer\Desktop\app\src
+Total : 15 files,  2513 codes, 173 comments, 162 blanks, all 2848 lines
+
+Languages
++------------+------------+------------+------------+------------+------------+
+| language   | files      | code       | comment    | blank      | total      |
++------------+------------+------------+------------+------------+------------+
+| JavaScript |         14 |      2,501 |        173 |        160 |      2,834 |
+| CSS        |          1 |         12 |          0 |          2 |         14 |
++------------+------------+------------+------------+------------+------------+
+
+Directories
++----------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                               | files      | code       | comment    | blank      | total      |
++----------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                  |         15 |      2,513 |        173 |        162 |      2,848 |
++----------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++----------------------------------------------------+------------+------------+------------+------------+------------+
+| filename                                           | language   | code       | comment    | blank      | total      |
++----------------------------------------------------+------------+------------+------------+------------+------------+
+| c:\Users\acer\Desktop\app\src\App.js               | JavaScript |         35 |          1 |          3 |         39 |
+| c:\Users\acer\Desktop\app\src\App.test.js          | JavaScript |          7 |          0 |          2 |          9 |
+| c:\Users\acer\Desktop\app\src\Calendar.js          | JavaScript |        550 |         33 |         36 |        619 |
+| c:\Users\acer\Desktop\app\src\CustomerDetail.js    | JavaScript |        530 |         44 |         20 |        594 |
+| c:\Users\acer\Desktop\app\src\DataVisualization.js | JavaScript |         35 |          0 |          4 |         39 |
+| c:\Users\acer\Desktop\app\src\Home.js              | JavaScript |        104 |          2 |         13 |        119 |
+| c:\Users\acer\Desktop\app\src\Login.js             | JavaScript |         92 |          6 |          4 |        102 |
+| c:\Users\acer\Desktop\app\src\NavigationBar.js     | JavaScript |         93 |          2 |          4 |         99 |
+| c:\Users\acer\Desktop\app\src\PersonalCenter.js    | JavaScript |        264 |         12 |         15 |        291 |
+| c:\Users\acer\Desktop\app\src\Search.js            | JavaScript |        287 |         24 |         25 |        336 |
+| c:\Users\acer\Desktop\app\src\UserManagement.js    | JavaScript |        476 |         42 |         28 |        546 |
+| c:\Users\acer\Desktop\app\src\index.css            | CSS        |         12 |          0 |          2 |         14 |
+| c:\Users\acer\Desktop\app\src\index.js             | JavaScript |         15 |          3 |          3 |         21 |
+| c:\Users\acer\Desktop\app\src\reportWebVitals.js   | JavaScript |         12 |          0 |          2 |         14 |
+| c:\Users\acer\Desktop\app\src\setupTests.js        | JavaScript |          1 |          4 |          1 |          6 |
+| Total                                              |            |      2,513 |        173 |        162 |      2,848 |
++----------------------------------------------------+------------+------------+------------+------------+------------+

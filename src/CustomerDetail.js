@@ -5,6 +5,13 @@ import { useLocation } from 'react-router-dom';
 import { visuallyHidden } from '@mui/utils';
 
 function ViewDialog({ open, onClose, data }) {
+  /*
+  * 客户经理信息查看对话框
+  * @param {boolean} open - 对话框是否打开
+  * @param {function} onClose - 关闭对话框的回调函数
+  * @param {object} data - 客户经理信息
+  * @returns {JSX.Element}
+  */
   return (
     <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
       <DialogTitle>客户经理信息</DialogTitle>
@@ -23,7 +30,15 @@ function ViewDialog({ open, onClose, data }) {
 }
 
 function EditDialog({ open, onClose, data, fetchData, id }) {
-
+  /*
+  * 客户信息编辑对话框
+  * @param {boolean} open - 对话框是否打开
+  * @param {function} onClose - 关闭对话框的回调函数
+  * @param {object} data - 客户信息
+  * @param {function} fetchData - 重新获取数据的回调函数
+  * @param {string} id - 客户ID
+  * @returns {JSX.Element}
+  */
   const handleSubmit = async (event) => {
     event.preventDefault(); // 阻止表单默认提交行为
     const formData = new FormData(event.currentTarget); // 获取表单数据
@@ -40,6 +55,7 @@ function EditDialog({ open, onClose, data, fetchData, id }) {
     const nsrzt_dm = formData.get('nsrzt_dm');
     const industry_top = formData.get('industry_top');
     
+    // 向后端发送请求，更新客户信息
     const response = await fetch('http://127.0.0.1:5000/customer_management/update_record', {
       method: 'POST',
       headers: {
@@ -61,17 +77,16 @@ function EditDialog({ open, onClose, data, fetchData, id }) {
           'nsrzt_dm': nsrzt_dm,
           'industry_top': industry_top,
         }
-        
       }),
     });
     const responseData = await response.json();
     if (response.ok) {
-      console.log(responseData.message);
+      // console.log(responseData.message);
       fetchData();
       onClose();
       window.alert(responseData.message);
     } else {
-      console.log(responseData.message);
+      // console.log(responseData.message);
       window.alert(responseData.message);
     }
   };
@@ -277,11 +292,16 @@ function EditDialog({ open, onClose, data, fetchData, id }) {
   );
 }
 
-function Details({ customerDetails, fetchData, id }) {
+function Details({ customerDetails }) {
+  /*
+  * 客户基本信息展示组件
+  * @param {object} customerDetails - 客户信息
+  * @returns {JSX.Element}
+  */
   const basicInfo = ['注册资本', '成立天数', '行业门类', '从业人数', '企业规模', '企业规模名称', '客户类型', '客户数量', '供应商数量', '信用等级', '纳税人状态代码', '增值纳税人类型'];
   const otherInfo = ['企税风险', '最近个税实际申报人数', '月均进项票量', '月均销项票量', '进项发票风险', '销项发票风险'];
 
-  return ( // 
+  return (
     <Box>
       <Grid container rowSpacing={3} sx={{ mb: 1.5 }}>
         {customerDetails.map(([key, value]) => {
@@ -306,14 +326,20 @@ function Details({ customerDetails, fetchData, id }) {
               </Grid>
             );
           }
-          return null; // Render nothing if the key is not in basicInfo
+          return null;
         })}
       </Grid>
     </Box>
   )
 }
 
-function stableSort(array, comparator) {
+function stableSort(array, comparator) { 
+  /*
+  * 对数组进行排序
+  * @param {Array} array - 待排序的数组
+  * @param {Function} comparator - 比较函数
+  * @returns {Array} - 排序后的数组
+  */
   const stabilizedThis = array.map((el, index) => [el, index]);
   stabilizedThis.sort((a, b) => {
     const order = comparator(a[0], b[0]);
@@ -327,24 +353,24 @@ function stableSort(array, comparator) {
 
 export default function CustomerDetail() {
   const location = useLocation();
-  const id = location.state.id;
-  const [customerDetails, setCustomerDetails] = React.useState({});
-  const [recommendationResult, setRecommendationResult] = React.useState({});
-  const [serviceRecords, setServiceRecords] = React.useState([]);
-  const [expanded, setExpanded] = React.useState(null);
-  const [order, setOrder] = React.useState('desc');
-  const [orderBy, setOrderBy] = React.useState('date');
-  const [viewDialog, setViewDialog] = React.useState({
+  const id = location.state.id; // 获取传递的参数，即客户ID
+  const [customerDetails, setCustomerDetails] = React.useState({}); // 客户信息
+  const [recommendationResult, setRecommendationResult] = React.useState({}); // 产品推荐结果
+  const [serviceRecords, setServiceRecords] = React.useState([]); // 历史跟进记录
+  const [expanded, setExpanded] = React.useState(null); // 是否展开产品描述
+  const [order, setOrder] = React.useState('desc'); // 排序方式
+  const [orderBy, setOrderBy] = React.useState('date'); // 排序字段
+  const [viewDialog, setViewDialog] = React.useState({ // 客户经理信息查看对话框
     open: false,
     data: {},
   });
-  const [editDialog, setEditDialog] = React.useState({
+  const [editDialog, setEditDialog] = React.useState({ // 客户信息编辑对话框
     open: false,
     data: {},
   });
-  const userPermission = localStorage.getItem("userPermission");
+  const userPermission = localStorage.getItem("userPermission"); // 用户权限
 
-  const headCells = [
+  const headCells = [ // 历史跟进记录表头
     { id: 'date', label: '日期' },
     { id: 'name', label: '负责人' },
     { id: 'product', label: '产品功能' },
@@ -352,17 +378,17 @@ export default function CustomerDetail() {
     { id: 'result', label: '结果' }
   ]
 
-  const onRequestSort = (event, property) => {
+  const onRequestSort = (event, property) => { // 设置排序方式及字段
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
   };
 
-  const createSortHandler = (property) => (event) => {
+  const createSortHandler = (property) => (event) => { // 排序处理函数
     onRequestSort(event, property);
   };
 
-  function descendingComparator(a, b, orderBy) {
+  function descendingComparator(a, b, orderBy) { // 降序排序比较函数
     if (b[orderBy] < a[orderBy]) {
       return -1;
     }
@@ -372,13 +398,13 @@ export default function CustomerDetail() {
     return 0;
   }
 
-  function getComparator(order, orderBy) {
+  function getComparator(order, orderBy) { // 获取比较函数
     return order === 'desc'
       ? (a, b) => descendingComparator(a, b, orderBy)
       : (a, b) => -descendingComparator(a, b, orderBy);
   }
 
-  const visibleRows = React.useMemo(
+  const visibleRows = React.useMemo( // 排序后的历史跟进记录
     () =>
       stableSort(serviceRecords, getComparator(order, orderBy)),
     [order, orderBy, serviceRecords],
@@ -389,54 +415,47 @@ export default function CustomerDetail() {
   }, []);
 
   const fetchData = async () => {
-    // console.log(id)
-    try {
-      const query = id;
-      const response = await fetch('http://127.0.0.1:5000/customer_management/query_details?query=' + encodeURIComponent(query))
-      if (!response.ok) {
-        throw new Error('无法获取用户数据');
-      }
-      const data = await response.json();
-      const serviceRecords = data.serviceRecords
-      const recommendations = data.recommend
-      const details = data.details
-      setServiceRecords(serviceRecords); 
-      setRecommendationResult(recommendations);
-      setCustomerDetails(details);
-    } catch (error) {
-      console.error('用户数据获取失败:', error);
+    const query = id;
+    // 向后端发送请求，获取客户详细信息
+    const response = await fetch('http://127.0.0.1:5000/customer_management/query_details?query=' + encodeURIComponent(query))
+    if (!response.ok) {
+      window.alert('无法获取客户详细信息');
+      return;
     }
+    const data = await response.json();
+    const serviceRecords = data.serviceRecords
+    const recommendations = data.recommend
+    const details = data.details
+    setServiceRecords(serviceRecords); 
+    setRecommendationResult(recommendations);
+    setCustomerDetails(details);
   };
 
-  const getChipColor = (membershipType) => {
+  const getChipColor = (membershipType) => { // 根据会员类型获取标签颜色
     switch (membershipType) {
-      case 'VIP':
-        return 'success';
-      case '非VIP':
-        return 'default';
-      case '过期VIP':
-        return 'error';
+      case 'VIP': return 'success';
+      case '非VIP': return 'default';
+      case '过期VIP': return 'error';
+      default: return;
     }
   };
 
   const handleOpenDialog = async () => {
-    try {
-      const response = await fetch('http://127.0.0.1:5000/customer_management/query_user?query=' + encodeURIComponent(customerDetails['当前客户经理']));
-      if (!response.ok) {
-        throw new Error('无法获取客户经理信息');
-      }
-      const data = await response.json();
-      console.log(data);
-      const detail = data.detail;
-      console.log(detail);
-      setViewDialog({ open: true, data: detail });
-    } catch (error) {
-      console.error('无法获取客户经理信息:', error);
+    // 向后端发送请求，获取客户经理信息
+    const response = await fetch('http://127.0.0.1:5000/customer_management/query_user?query=' + encodeURIComponent(customerDetails['当前客户经理']));
+    if (!response.ok) {
+      window.alert('无法获取客户经理信息');
+      return;
     }
+    const data = await response.json();
+    // console.log(data);
+    const detail = data.detail;
+    // console.log(detail);
+    setViewDialog({ open: true, data: detail });
   }
 
-  const handleEditClick = (key, value) => {
-    console.log('Clicked item:', { key, value });
+  const handleEditClick = (key, value) => { // 处理编辑按钮点击事件
+    // console.log('Clicked item:', { key, value });
     setEditDialog({ open: true, data: customerDetails })
   };
 
@@ -446,6 +465,7 @@ export default function CustomerDetail() {
       <NavigationBar />
       <Box sx={{ ml: 30, my: 3, mr: 5 }}>
         <Grid container spacing={2}>
+          {/* 客户基本信息展示 */}
           <Grid item xs={12} md={7} lg={8}>
             <Paper
               sx={{
@@ -459,11 +479,13 @@ export default function CustomerDetail() {
                 {customerDetails['客户名称']}
                 <Chip label={customerDetails['会员类型']} variant="outlined" size='small' color={getChipColor(customerDetails['会员类型'])} sx={{ ml: 2, verticalAlign: 'middle' }}/>
                 <Box sx={{ flexGrow: 1 }}/>
+                {/* 编辑按钮，只有管理员可以编辑客户信息 */}
                 {userPermission === '1' && <Button variant='contained' onClick={handleEditClick}>编辑</Button>}
               </Typography>
-              <Details customerDetails={Object.entries(customerDetails)} fetchData={fetchData} id={id}/>
+              <Details customerDetails={Object.entries(customerDetails)}/>
             </Paper>
           </Grid>
+          {/* 产品推荐 */}
           <Grid item xs={12} md={5} lg={4}>
             <Paper
               sx={{
@@ -479,11 +501,12 @@ export default function CustomerDetail() {
               </Stack>
               <List sx={{ overflowY: 'auto' }}>
                 {Object.entries(recommendationResult).map(([key, value]) => (
-                  key != 'date' && (
+                  key !== 'date' && (
                   <React.Fragment key={key}>
                     <ListItem button onClick={() => setExpanded(expanded === key ? null : key)}>
                       <ListItemText primary={`${key.slice(3)}. ${value.name}`} />
                     </ListItem>
+                    {/* 展开产品描述 */}
                     <Collapse in={expanded === key} timeout="auto" unmountOnExit sx={{ px: 2 }}>
                       <Typography color='green' fontWeight='700' variant='body2' component='div'>{value.similarity}企业已使用此产品，其中有{value.similarity2}企业规模相同</Typography>
                       <Typography variant='body2' component='div'>{value.description}</Typography>
@@ -514,8 +537,8 @@ export default function CustomerDetail() {
               <Typography sx={{ mr: 10 }}>{customerDetails['当前客户经理持续天数']}天</Typography>
               </Grid>
             </Grid>
-            
           </Grid>
+          {/* 历史跟进记录 */}
           <Grid item xs={12}>
             <TableContainer 
               sx={{ 

@@ -80,6 +80,7 @@ class CustomerManagement:
             description = DescriptionDAO.get_name(field)
             # 获取字段对应的数据
             data = getattr(details, field)
+            if data is None: data = '未知'
             if field == 'khjl': data = UserDAO.get_name(data) # 从客户经理id得到名字
             customer_data[description] = data
         

@@ -3,36 +3,36 @@ import { Button, CssBaseline, TextField, Box, Typography, Container } from '@mui
 import { useNavigate } from 'react-router-dom';
 
 export default function Login() {
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // 导航函数
 
-  // 处理登录请求给后端，提交用户名和密码
+  // 向后端发送登录请求，获取 token
   const handleSubmit = async (event) => {
-      event.preventDefault();
-      const username = new FormData(event.currentTarget).get('username');
-      const password = new FormData(event.currentTarget).get('password');
-      console.log('登录界面-用户名和密码：', {username, password});
-      const response = await fetch('http://127.0.0.1:5000/personal_center/login', {
-          method: 'POST',
-          headers: {
-              'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ 'username': username, 'password': password }),
-      });
-      const responseData = await response.json(); // 解析返回的 JSON 数据
+    event.preventDefault(); // 阻止表单默认提交行为
+    const username = new FormData(event.currentTarget).get('username');
+    const password = new FormData(event.currentTarget).get('password');
+    // console.log('登录界面-用户名和密码：', {username, password});
+    const response = await fetch('http://127.0.0.1:5000/personal_center/login', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 'username': username, 'password': password }),
+    });
+    const responseData = await response.json(); // 解析返回的 JSON 数据
 
-      if (response.ok) {
-          console.log('登录成功');
-          // setOpen(true);
-          localStorage.setItem("token", responseData.token);
-          localStorage.setItem("userPermission", responseData.userPermission);
-          localStorage.setItem("name", responseData.name);
-          console.log('登录界面-userPermission：', localStorage.getItem("userPermission"));
-          navigate('/home'); // 跳转到系统首页
-          // window.alert(responseData.message);
-      } else {
-          console.log('登录失败');
-          window.alert(responseData.message);
-      }
+    if (response.ok) {
+        console.log('登录成功');
+        // setOpen(true);
+        localStorage.setItem("token", responseData.token);
+        localStorage.setItem("userPermission", responseData.userPermission);
+        localStorage.setItem("name", responseData.name);
+        // console.log('登录界面-userPermission：', localStorage.getItem("userPermission"));
+        navigate('/home'); // 跳转到系统首页
+        // window.alert(responseData.message);
+    } else {
+        // console.log('登录失败');
+        window.alert(responseData.message);
+    }
   };
 
   return (
@@ -47,6 +47,7 @@ export default function Login() {
             alignItems: 'center',
           }}
         >
+          {/* 系统名称 */}
           <Typography component="h5" variant="h4"
             sx={{ 
               my: 5, 
@@ -63,6 +64,7 @@ export default function Login() {
           <Typography component="h5" variant="h5">
             登录
           </Typography>
+          {/* 登录表单 */}
           <Box component="form" onSubmit={handleSubmit} noValidate sx={{ my: 3 }}>
             <TextField
               margin="normal"

@@ -15,7 +15,7 @@ def login(): # 处理登录
     else: return jsonify({'message': '密码错误'}), 400
 
 @bp.route('/personal_center/change_password', methods=['POST'])
-def change_password():
+def change_password(): # 修改密码
     data = request.json
     token = request.headers.get('Authorization')
     oldPassword = data.get('oldPassword')
@@ -28,13 +28,13 @@ def change_password():
     
 
 @bp.route('/personal_center/query_personal_info', methods=['POST'])
-def query_personal_info():
+def query_personal_info(): # 查询个人信息
     token = request.headers.get('Authorization')
     record_data = PersonalCenter.get_personal_info(token)
     return jsonify({'record': record_data}), 200
 
 @bp.route('/personal_center/update_info', methods=['POST'])
-def update_info():
+def update_info(): # 更新个人信息
     data = request.json
     token = request.headers.get('Authorization')
     name = data.get('name')

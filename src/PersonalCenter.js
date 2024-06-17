@@ -1,14 +1,14 @@
 import * as React from 'react';
-import { CssBaseline, Box, Paper, Typography, Dialog, DialogTitle, DialogContent, Stack, TextField, DialogActions, Button, List, ListItemButton, ListItemIcon, ListItemText, Divider, Tabs, Tab, Grid, Chip, Radio, RadioGroup, FormControlLabel } from '@mui/material';
+import { CssBaseline, Box, Paper, Typography, Dialog, DialogTitle, TextField, DialogActions, Button, Tabs, Tab, Grid, Chip, Radio, RadioGroup, FormControlLabel } from '@mui/material';
 import NavigationBar from './NavigationBar';
 import { LocalPhone, Email, Forum, Badge, Person, Wc } from '@mui/icons-material';
 
 export default function PersonalCenter() {
-  const [activeSetting, setActiveSetting] = React.useState('basic');
-  const [info, setInfo] = React.useState({});
-  const [isEdit, setIsEdit] = React.useState(0);
-  const [formData, setFormData] = React.useState({
-    oldPassword: '',
+  const [activeSetting, setActiveSetting] = React.useState('basic'); // 当前所在的个人中心页面 - 基本设置/安全设置
+  const [info, setInfo] = React.useState({}); // 个人信息
+  const [isEdit, setIsEdit] = React.useState(0); // 是否处于编辑模式
+  const [formData, setFormData] = React.useState({ // 表单数据
+    oldPassword: '', 
     newPassword: '',
     confirmPassword: '',
     openConfirmDialog: false,
@@ -19,6 +19,7 @@ export default function PersonalCenter() {
   }, []);
 
   const fetchData = async () => {
+    // 向后端请求数据，获取个人信息
     const response = await fetch('http://127.0.0.1:5000/personal_center/query_personal_info', {
       method: 'POST',
       headers: {
@@ -30,17 +31,17 @@ export default function PersonalCenter() {
       const record = data.record
       setInfo(record);
     } else {
-      console.log('获取数据失败')
-      // window.alert()
+      // console.log('获取数据失败');
+      window.alert('无法获取个人信息');
     }
     
   }
 
-  const handleOpenSettings = (event, newValue) => {
+  const handleOpenSettings = (event, newValue) => { // 切换个人中心页面
     setActiveSetting(newValue);
   };
 
-  const handleChange = (event) => {
+  const handleChange = (event) => { // 处理表单数据变化
     const { name, value } = event.target;
     setFormData(prevData => ({
       ...prevData,
@@ -51,6 +52,7 @@ export default function PersonalCenter() {
   const handleConfirm = async () => {
     const oldp = formData.oldPassword;
     const newp = formData.newPassword;
+    // 向后端发送修改密码请求
     const response = await fetch('http://127.0.0.1:5000/personal_center/change_password', {
       method: 'POST',
       headers: {
@@ -65,10 +67,10 @@ export default function PersonalCenter() {
     const responseData = await response.json(); // 解析返回的 JSON 数据
 
     if (response.ok) {
-      console.log(responseData.message);
+      // console.log(responseData.message);
       window.alert(responseData.message);
     } else {
-      console.log(responseData.message);
+      // console.log(responseData.message);
       window.alert(responseData.message);
     }
     setFormData({
@@ -76,16 +78,15 @@ export default function PersonalCenter() {
       newPassword: '', 
       confirmPassword: '',
       openConfirmDialog: false });
-    // window.alert(responseData.message);
   };
 
-  const handleChangePassword = async (event) => {
+  const handleChangePassword = async (event) => { // 处理修改密码表单提交
     event.preventDefault(); // 阻止表单默认提交行为
     const formData = new FormData(event.currentTarget); // 获取表单数据
     const oldPassword = formData.get('oldPassword');
     const newPassword = formData.get('newPassword');
     const confirmPassword = formData.get('confirmPassword');
-    console.log('修改密码界面-旧密码和新密码：', {oldPassword, newPassword});
+    // console.log('修改密码界面-旧密码和新密码：', {oldPassword, newPassword});
     
     // 校验数据
     if (!newPassword || !confirmPassword || !oldPassword) {
@@ -113,8 +114,8 @@ export default function PersonalCenter() {
     const gender = formData.get('gender');
     console.log({name, phone, email, wechatid});
 
-    const mailregex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]+$/i;
-    const telregex = /^1[3-9]\d{9}$/;
+    const mailregex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]+$/i; // 邮箱正则表达式
+    const telregex = /^1[3-9]\d{9}$/; // 电话号码正则表达式
     
     // 校验数据
     if (!name || !phone || !email || !wechatid || !gender) {
@@ -127,6 +128,7 @@ export default function PersonalCenter() {
       window.alert('请输入正确的电话号码格式');
       return;
     } else {
+      // 向后端发送修改个人信息请求
       const response = await fetch('http://127.0.0.1:5000/personal_center/update_info', {
         method: 'POST',
         headers: {
@@ -144,12 +146,12 @@ export default function PersonalCenter() {
       const responseData = await response.json(); // 解析返回的 JSON 数据
 
       if (response.ok) {
-        console.log(responseData.message);
+        // console.log(responseData.message);
         fetchData();
         setIsEdit(0);
         window.alert(responseData.message);
       } else {
-        console.log(responseData.message);
+        // console.log(responseData.message);
         window.alert(responseData.message);
       }
     }
@@ -174,6 +176,7 @@ export default function PersonalCenter() {
               </Tabs>
             </Box>
             <Box sx={{ py: 5, px: 10, flex: 1, display: 'flex', flexDirection: 'column' }}>
+              {/* 基本设置 */}
               {activeSetting === 'basic' && (
                 <Box component='form' onSubmit={handleUpdateInfo} >
                   <Typography variant="h6" sx={{ mb: 4 }}>个人信息</Typography>
@@ -209,7 +212,7 @@ export default function PersonalCenter() {
                     </Grid>
                     <Grid item xs={9}>{ 
                         isEdit ?
-                        (<RadioGroup row value={info.gender} name="gender" sx={{ '& .MuiSvgIcon-root': { fontSize: 16 }, '& .MuiTypography-body1': { fontSize: 16 } }}>
+                        (<RadioGroup row defaultValue={parseInt(info.gender)} name="gender" sx={{ '& .MuiSvgIcon-root': { fontSize: 16 }, '& .MuiTypography-body1': { fontSize: 16 } }}>
                           <FormControlLabel value="1" control={<Radio/>} label="男" />
                           <FormControlLabel value="0" control={<Radio/>} label="女" />
                         </RadioGroup>) :
@@ -261,6 +264,7 @@ export default function PersonalCenter() {
                   }
                 </Box>
               )}
+              {/* 安全设置 */}
               {activeSetting === 'security' && (
                 <Box component='form' onSubmit={handleChangePassword} >
                   <Typography variant="h6">修改密码</Typography>
@@ -280,15 +284,6 @@ export default function PersonalCenter() {
                 </Box>
               )}
             </Box>
-            {/* 
-              <Typography>ID</Typography>
-              <Typography>姓名</Typography>
-              <Typography>联系方式</Typography>
-              <Typography>电子邮件</Typography>
-            */}
-            
-            {/* <Button onClick={() => setOpenDialog(true)}>修改密码</Button>
-            <ChangePasswordDialog open={openDialog} handleClose={() => setOpenDialog(false)}/> */}
         </Paper>
       </Box>
     </Box>

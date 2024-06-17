@@ -16,8 +16,8 @@ def update_permission(): # 更新用户权限
     UserManagement.update_permission(username)
     return jsonify({'message': '用户权限已更新'}), 200
 
-@bp.route('/user_management/query_user', methods=['POST'])
-def query_user(): # 搜索某些用户
+@bp.route('/user_management/query_users', methods=['POST'])
+def query_users(): # 搜索某些用户
     token = request.headers.get('Authorization')
     data = request.json
     keyword = data.get('query')
@@ -38,3 +38,9 @@ def add_user(): # 添加新用户
     res = UserManagement.add_user(id, name, gender, phone, email, wechatid, password, permission)
     if res: return jsonify({'message': '用户添加成功'}), 200
     else: return jsonify({'message': '用户添加失败，id已被使用过'}), 400
+
+@bp.route('/user_management/query_user', methods=['GET'])
+def query_user(): # 获取某个用户的信息
+    id = request.args.get('query')
+    detail = UserManagement.get_user(id)
+    return jsonify({'detail': detail}), 200

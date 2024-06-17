@@ -5,12 +5,12 @@ import { useNavigate } from 'react-router-dom';
 import { Home, Search, AccountCircle, Logout, CalendarMonth, PeopleAlt } from '@mui/icons-material';
 
 export default function NavigationBar() {
-  const navigate = useNavigate();
-  const pages = ['首页', '搜索', '跟进管理', '同事列表'];
-  const settings = ['个人中心', '登出'];
-  const userPermission = localStorage.getItem("userPermission");
+  const navigate = useNavigate(); // 页面跳转函数
+  const pages = ['首页', '搜索', '跟进管理', '同事列表']; // 导航栏元素
+  const settings = ['个人中心', '登出']; // 导航栏元素
+  const userPermission = localStorage.getItem("userPermission"); // 用户权限
 
-  const pageIcons = {
+  const pageIcons = { // 导航栏元素对应的图标
     '首页': <Home />,
     '搜索': <Search />,
     '跟进管理': <CalendarMonth />,
@@ -19,8 +19,7 @@ export default function NavigationBar() {
     '登出': <Logout />,
   };
 
-  // 处理页面跳转
-  const handlePageClick = (page) => {
+  const handlePageClick = (page) => { // 导航栏元素点击事件处理函数，处理页面跳转
     if (page === '跟进管理' && userPermission === 1) {
       return; // 禁止点击操作
     }
@@ -68,10 +67,14 @@ export default function NavigationBar() {
         <List>
           {pages.map((page) => (
             <ListItem key={page} disablePadding>
-              <ListItemButton onClick={() => handlePageClick(page)} disabled={page === '跟进管理' && userPermission === '1'}>
+              <ListItemButton 
+                onClick={() => handlePageClick(page)} 
+                disabled={page === '跟进管理' && userPermission === '1'} // 管理员不能进入‘跟进管理’页面
+              >
                 <ListItemIcon sx={{ color: 'inherit' }}>
                   {pageIcons[page]}
                 </ListItemIcon>
+                {/* 管理员看到的用户管理页面是‘权限管理’，用户看到的用户管理页面是‘同事列表’ */}
                 <ListItemText primary={userPermission === '1' && page === '同事列表' ? '权限管理' : page} />
               </ListItemButton>
             </ListItem>

@@ -19,30 +19,19 @@ function AddDialog({ open, handleClose, products, customers, fetchData, date }) 
   */
   const name = localStorage.getItem("name"); // 获取目前登录用户的用户名
 
-  const today = new Date();
+  const today = new Date(); // 获取今天的日期
   const formattedDate = today.toISOString().split('T')[0];
-  const isRequired = date < formattedDate ? true : false;
+  const isRequired = date < formattedDate ? true : false; // 如果选择的日期早于今天，则为必填项
 
   const [cid, setCid] = React.useState(null);
   const [pid, setPid] = React.useState(null);
   const [result, setResult] = React.useState(null);
 
   const resultOptions = [ // 结果选项
-    {
-      value: 0,
-      label: '无意向',
-    },
-    {
-      value: 2,
-      label: '有意向',
-    },
-    {
-      value: 1,
-      label: '已购买',
-    },
+    { value: 0, label: '无意向' },
+    { value: 2, label: '有意向' },
+    { value: 1, label: '已购买' },
   ];
-
-  // React.useEffect(() => {console.log(result)}, []);
 
   const handleSubmit = async (event) => {
     event.preventDefault(); // 阻止表单默认提交行为
@@ -67,12 +56,12 @@ function AddDialog({ open, handleClose, products, customers, fetchData, date }) 
     });
     const responseData = await response.json();
     if (response.ok) {
-      console.log(responseData.message);
+      // console.log(responseData.message);
       fetchData();
       handleClose();
       window.alert(responseData.message);
     } else {
-      console.log(responseData.message);
+      // console.log(responseData.message);
       window.alert(responseData.message);
     }
   };
@@ -100,6 +89,12 @@ function AddDialog({ open, handleClose, products, customers, fetchData, date }) 
               fullWidth
               ListboxProps={{ style: { maxHeight: 150 } }}
               options={customers}
+              getOptionLabel={(option) => option.label}
+              renderOption={(props, option) => (
+                <Box component="li" {...props}>
+                  {option.id} - {option.label}
+                </Box>
+              )}
               onChange={(event, option) => option ? setCid(option.id) : null}
               renderInput={(params) => 
               <TextField {...params} 
@@ -188,34 +183,25 @@ function EditDialog({ open, handleClose, row, fetchData, products, customers }) 
   * @param {array} products - 产品列表
   * @param {array} customers - 客户列表
   * @returns {JSX.Element}
- */
+  */
 
-  const resultOptions = [
-    {
-      id: 0,
-      label: '无意向',
-    },
-    {
-      id: 2,
-      label: '有意向',
-    },
-    {
-      id: 1,
-      label: '已购买',
-    },
+  const resultOptions = [ // 结果选项
+    { id: 0, label: '无意向' },
+    { id: 2, label: '有意向' },
+    { id: 1, label: '已购买' },
   ];
 
-  const today = new Date();
+  const today = new Date(); // 获取今天的日期
   const formattedDate = today.toISOString().split('T')[0];
-  const isRequired = row.date < formattedDate ? true : false;
+  const isRequired = row.date < formattedDate ? true : false; // 如果选择的日期早于今天，则为必填项
 
-  const [state, setState] = React.useState({
+  const [state, setState] = React.useState({ 
     cid: null,
     pid: null,
     result: null,
     openConfirmDialog: false
   });
-  const name = localStorage.getItem("name");
+  const name = localStorage.getItem("name"); // 获取目前登录用户的用户名
 
   React.useEffect(() => {
     setState(prevState => ({
@@ -226,13 +212,13 @@ function EditDialog({ open, handleClose, row, fetchData, products, customers }) 
     }));
   }, [row]);
 
-  const handleDelete = () => {
+  const handleDelete = () => { // 打开确认删除对话框
     setState({ ...state, openConfirmDialog: true})
   }
 
-  const handleCloseAll = () => {
+  const handleCloseAll = () => { // 关闭确认删除对话框和编辑对话框
     setState({ ...state, openConfirmDialog: false });
-    handleClose(); // This should close the EditDialog
+    handleClose();
   };
 
   const handleSubmit = async (event) => {
@@ -241,7 +227,7 @@ function EditDialog({ open, handleClose, row, fetchData, products, customers }) 
     const date = formData.get('date');
     const content = formData.get('content');
 
-    console.log('date:', date, 'cid:', state.cid, 'pid:', state.pid, 'content:', content, 'result:', state.result);
+    // 向后端发送请求，更新记录
     const response = await fetch('http://127.0.0.1:5000/follow_up_management/update_record', {
       method: 'POST',
       headers: {
@@ -259,12 +245,12 @@ function EditDialog({ open, handleClose, row, fetchData, products, customers }) 
     const responseData = await response.json();
 
     if (response.ok) {
-      console.log(row.sid, responseData.message);
+      // console.log(row.sid, responseData.message);
       fetchData();
       handleClose();
       window.alert(responseData.message);
     } else {
-      console.log(row.sid, responseData.message);
+      // console.log(row.sid, responseData.message);
       window.alert(responseData.message);
     }
   };
@@ -404,8 +390,8 @@ function EditDialog({ open, handleClose, row, fetchData, products, customers }) 
       </DialogActions>
       <ConfirmDialog
         open={state.openConfirmDialog}
-        handleClose={() => {setState({ ...state, openConfirmDialog: false})}}  // Pass the new handler that closes both dialogs
-        handleFinalize={handleCloseAll}  // Handling after confirmation
+        handleClose={() => {setState({ ...state, openConfirmDialog: false})}}
+        handleFinalize={handleCloseAll}
         row={row}
         fetchData={fetchData}
       />
@@ -417,6 +403,7 @@ function ConfirmDialog({ open, handleClose, handleFinalize, row, fetchData }) {
   const sid = row.sid;
 
   const handleConfirm = async () => {
+    // 向后端发送请求，删除记录
     const response = await fetch('http://127.0.0.1:5000/follow_up_management/delete_record', {
       method: 'POST',
       headers: {
@@ -427,12 +414,12 @@ function ConfirmDialog({ open, handleClose, handleFinalize, row, fetchData }) {
     const responseData = await response.json();
 
     if (response.ok) {
-      console.log(sid, responseData.message);
+      // console.log(sid, responseData.message);
       fetchData();
       handleFinalize();
       window.alert(responseData.message);
     } else {
-      console.log(sid, responseData.message);
+      // console.log(sid, responseData.message);
       window.alert(responseData.message);
     }
   };
@@ -449,20 +436,20 @@ function ConfirmDialog({ open, handleClose, handleFinalize, row, fetchData }) {
   );
 }
 
-export default function Notification() {
+export default function Calendar() {
   const [state, setState] = React.useState({
-    openAddDialog: false,
-    openEditDialog: false,
-    openConfirmDialog: false,
-    selectedDate: null,
-    selectedRecord: {},
-    productOptions: [],
-    customerData: [],
-    events: [],
-    records: [],
+    openAddDialog: false, // 控制添加记录对话框的打开和关闭
+    openEditDialog: false, // 控制编辑记录对话框的打开和关闭
+    openConfirmDialog: false, // 控制确认删除对话框的打开和关闭
+    selectedDate: null, // 选中的日期
+    selectedRecord: {}, // 选中的记录
+    productOptions: [], // 产品列表
+    customerData: [], // 客户列表
+    events: [], // 日历事件
+    records: [], // 所有记录
   });
 
-  const resultColorMapping = {
+  const resultColorMapping = { // 记录的结果与日历中颜色的映射
     '无意向': 'gray',
     '有意向': 'red',
     '已购买': 'green',
@@ -470,7 +457,7 @@ export default function Notification() {
     '无': 'blue'
   };
 
-  const handleDialogToggle = React.useCallback((date, row, dialogName, isOpen) => {
+  const handleDialogToggle = React.useCallback((date, row, dialogName, isOpen) => { // 控制对话框的打开和关闭
     setState((prevState) => ({
       ...prevState,
       selectedDate: date,
@@ -481,26 +468,28 @@ export default function Notification() {
 
   const handleEventClick = async (info) => {
     const sid = info.event.extendedProps.sid
+    // 向后端发送请求，获取选中记录的详细信息
     const response = await fetch('http://127.0.0.1:5000/follow_up_management/query_record?query=' + encodeURIComponent(sid));
     if (!response.ok) {
-      throw new Error('无法获取用户数据');
+      window.alert("获取数据失败");
+      return;
     }
     const data = await response.json();
     const row = data.record
     handleDialogToggle(null, row, 'openEditDialog', true);
   }
 
-  const handleDateClick = (info) => {
+  const handleDateClick = (info) => { // 点击日期格子
     const date = info.dateStr;
-    handleDialogToggle(date, {}, 'openAddDialog', true);
+    handleDialogToggle(date, {}, 'openAddDialog', true); // 打开添加记录对话框
   }
 
-  const convertToCalendarEvents = (data) => {
+  const convertToCalendarEvents = (data) => { // 将记录转换为日历事件
     return data.map(record => ({
       id: record.sid,
       title: record.title,
       date: record.date,
-      color: resultColorMapping[record.result],
+      color: resultColorMapping[record.result], // 根据结果映射颜色
       extendedProps: {
         sid: record.sid,
       }
@@ -509,50 +498,59 @@ export default function Notification() {
 
   React.useEffect(() => {
     fetchData();
+    fetchData2();
   }, []);
 
   const fetchData = async () => {
-    try {
-      const response = await fetch('http://127.0.0.1:5000/follow_up_management/query_all_records', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': localStorage.getItem("token")
-      }})
-      if (!response.ok) {
-        throw new Error('无法获取用户数据');
-      }
-      const data = await response.json();
-      const records = data.records
-      const events = convertToCalendarEvents(records);
-
-      const response2 = await fetch('http://127.0.0.1:5000/follow_up_management/get_product_options');
-      if (!response.ok) {
-        throw new Error('无法获取用户数据');
-      }
-      const data2 = await response2.json();
-      const products = data2.products;
-
-      const response3 = await fetch('http://127.0.0.1:5000/follow_up_management/query_customers');
-      if (!response.ok) {
-        throw new Error('无法获取用户数据');
-      }
-      const data3 = await response3.json();
-      const customers = data3.customers
-
-      setState(prevState => ({
-        ...prevState,
-        events: events,
-        records: records,
-        productOptions: products,
-        customerData: customers,
-      }));
-    } catch (error) {
-      console.error('用户数据获取失败:', error);
+    // 向后端发送请求，获取所有记录
+    const response = await fetch('http://127.0.0.1:5000/follow_up_management/query_all_records', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': localStorage.getItem("token")
+    }})
+    if (!response.ok) {
+      window.alert("获取数据失败");
+      return;
     }
+    const data = await response.json();
+    const records = data.records
+    const events = convertToCalendarEvents(records);
+
+    setState(prevState => ({
+      ...prevState,
+      events: events,
+      records: records,
+    }));
   };
 
-  const Legend = ({ colorMapping }) => (
+  const fetchData2 = async () => {
+    // 向后端发送请求，获取产品列表
+    const response = await fetch('http://127.0.0.1:5000/follow_up_management/get_product_options');
+    if (!response.ok) {
+      window.alert("获取产品列表失败");
+      return;
+    }
+    const data = await response.json();
+    const products = data.products;
+
+    // 向后端发送请求，获取客户列表
+    const response2 = await fetch('http://127.0.0.1:5000/follow_up_management/query_customers');
+    if (!response2.ok) {
+      window.alert("获取客户列表失败");
+      return;
+    }
+    const data2 = await response2.json();
+    const customers = data2.customers
+
+    setState(prevState => ({
+      ...prevState,
+      productOptions: products,
+      customerData: customers,
+    }));
+  };
+
+  const Legend = ({ colorMapping }) => ( // 日历事件颜色的图例
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
       {Object.entries(colorMapping).map(([status, color]) => (
         <div key={status} style={{ display: 'flex', alignItems: 'center', marginRight: '15px' }}>
@@ -580,11 +578,11 @@ export default function Notification() {
             initialView="dayGridMonth"
             locale={'zh-cn'}
             headerToolbar={{
-              start: 'prev,next today', // Buttons on the left
-              center: 'title',   // Title in the center
-              end: 'dayGridMonth,listMonth'     // Custom element on the right
+              start: 'prev,next today', // 左侧按钮
+              center: 'title',   // 中间标题
+              end: 'dayGridMonth,listMonth' // 右侧按钮
             }}
-            buttonText={{today: '今天', dayGridMonth: '网格', listMonth: '列表', prev: '上一月', next: '下一月'}}
+            buttonText={{today: '今天', dayGridMonth: '网格', listMonth: '列表', prev: '上一月', next: '下一月'}} // 自定义按钮文本
             weekends={true}
             events={state.events}
             eventClick={handleEventClick}
