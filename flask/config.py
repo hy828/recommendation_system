@@ -8,7 +8,7 @@ jwt_secret_key = os.getenv('JWT_SECRET_KEY')
 
 DIALECT = os.getenv('DIALECT')
 DRIVER = os.getenv('DRIVER')
-USERNAME = os.getenv('USERNAME')
+USERNAME = os.getenv('USER')
 PASSWORD = os.getenv('PASSWORD')
 HOST = os.getenv('HOST')
 PORT = os.getenv('PORT')
