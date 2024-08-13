@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 
-JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY')
+jwt_secret_key = os.getenv('JWT_SECRET_KEY')
 
 DIALECT = os.getenv('DIALECT')
 DRIVER = os.getenv('DRIVER')
